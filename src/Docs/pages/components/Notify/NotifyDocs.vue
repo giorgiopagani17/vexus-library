@@ -11,7 +11,7 @@
     <!-- Installazione -->
     <section class="docs-section">
       <h2>Setup</h2>
-      <p>Monta il container una sola volta in <code>App.vue</code>:</p>
+      <p>Importa il Notify nel <code>File.vue</code>:</p>
       <DesignCodeBlock :code="setupCode" />
     </section>
 
