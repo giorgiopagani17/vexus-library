@@ -1,0 +1,27 @@
+{
+  "compilerOptions": {
+    "target": "esnext",
+    "module": "esnext",
+    "moduleResolution": "bundler",
+    "strict": true,
+    "jsx": "preserve",
+    "sourceMap": true,
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["src/*"]
+    },
+    "resolveJsonModule": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true
+  },
+  "include": ["src/**/*.ts", "src/**/*.d.ts", "src/**/*.tsx", "src/**/*.vue"],
+  "exclude": [
+    "./dist",
+    "./.quasar",
+    "./node_modules",
+    "./src-capacitor",
+    "./src-cordova",
+    "./quasar.config.*.temporary.compiled*"
+  ]
+}

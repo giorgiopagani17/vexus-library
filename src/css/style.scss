@@ -1,0 +1,28 @@
+@import 'material-icons/iconfont/material-icons.css';
+
+html, body, #app {
+  margin: 0;
+}
+
+body {
+  position: relative;
+  overflow-x: hidden;
+  background:
+    radial-gradient(circle at 20% 20%, rgba($primary, 0.18), transparent 40%),
+    radial-gradient(circle at 80% 80%, rgba($secondary, 0.12), transparent 45%),
+    $tertiary;
+  color: white;
+}
+
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  background-image:
+    linear-gradient(rgba($primary, 0.06) 1px, transparent 1px),
+    linear-gradient(90deg, rgba($primary, 0.06) 1px, transparent 1px);
+  background-size: 48px 48px;
+  mask-image: radial-gradient(circle at center, black, transparent 75%);
+  pointer-events: none;
+}
