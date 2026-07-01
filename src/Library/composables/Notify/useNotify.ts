@@ -54,6 +54,7 @@ export interface NotifyOptions {
   radius?: NotifySize            // default 14 (px)
   closeButtonSize?: NotifySize   // default 16 (px)
   actions?: NotifyAction[]
+  alignItems?: 'flex-start' | 'center' | 'flex-end'
   closable?: boolean
   onClose?: (() => void) | null
 }
@@ -76,6 +77,7 @@ export interface Notification {
   radius: NotifySize
   closeButtonSize: NotifySize
   actions: NotifyAction[]
+  alignItems?: 'flex-start' | 'center' | 'flex-end'
   closable: boolean
   onClose: (() => void) | null
   count: number
@@ -237,6 +239,7 @@ export function useNotify() {
     if (patch.titleSize !== undefined) notification.titleSize = patch.titleSize
     if (patch.radius !== undefined) notification.radius = patch.radius
     if (patch.closeButtonSize !== undefined) notification.closeButtonSize = patch.closeButtonSize
+    if (patch.alignItems !== undefined) notification.alignItems = patch.alignItems
 
     if (patch.duration !== undefined) {
       notification.duration = patch.duration
@@ -296,6 +299,7 @@ function pushNotification(
     radius: options.radius ?? 14,
     closeButtonSize: options.closeButtonSize ?? 16,
     actions: options.actions ?? [],
+    alignItems: options.alignItems ?? 'center',
     closable: options.closable ?? true,
     onClose: options.onClose ?? null,
     count: 1,

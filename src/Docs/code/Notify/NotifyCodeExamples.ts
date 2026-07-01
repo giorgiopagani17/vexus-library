@@ -111,6 +111,7 @@ export const sizeCode = `notify({
   textSize: 15,
   radius: 20,
   closeButtonSize: 24,
+  alignItems: 'flex-end',
   duration: 6000
 })`
 

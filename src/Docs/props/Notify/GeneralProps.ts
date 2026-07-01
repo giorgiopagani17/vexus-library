@@ -22,6 +22,7 @@ export const generalProps = [
   { name: 'radius', type: 'number | string', default: '14', desc: 'Raggio di curvatura in px dei bordi della notifica' },
   { name: 'closeButtonSize', type: 'number | string', default: '16', desc: 'Dimensione in px del pulsante di chiusura' },
   { name: 'actions', type: 'Array<{ label, action, color? }>', default: '[]', desc: 'Bottoni interattivi dentro la notifica' },
+  { name: 'alignItems', type: "'flex-start' | 'center' | 'flex-end'", default: "'center'", desc: 'Allineamento verticale del contenuto della notifica' },
   { name: 'closable', type: 'boolean', default: 'true', desc: 'Mostra/nasconde il pulsante di chiusura manuale' },
   { name: 'onClose', type: '() => void | null', default: 'null', desc: 'Callback eseguita alla chiusura' }
 ]

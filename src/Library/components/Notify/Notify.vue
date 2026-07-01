@@ -146,6 +146,7 @@ const cssVars = computed(() => {
   vars['--toast-radius'] = toCssSize(n.radius) ?? '14px'
   vars['--toast-close-size'] = toCssSize(n.closeButtonSize) ?? '16px'
   vars['--toast-duration'] = `${n.duration}ms`
+  vars['--toast-align-items'] = n.alignItems ?? 'center'
 
   return vars
 })
@@ -175,6 +176,7 @@ const handleAction = (action) => {
   --toast-text-size: 13px;
   --toast-title-size: 13px;
   --toast-radius: 14px;
+  --toast-align-items: center;
   --toast-close-size: 16px;
 
   /* Container esterno: NIENTE overflow qui, così il badge può sporgere
@@ -217,7 +219,7 @@ da questo elemento, non viene mai tagliato. */
 .toast-inner {
   position: relative;
   display: flex;
-  align-items: flex-start;
+  align-items: var(--toast-align-items);
   gap: 12px;
   width: 100%;
   padding: 14px 16px;
