@@ -72,7 +72,8 @@ const menuItems = [
   { label: 'Home', icon: Home, to: '/' },
   { label: 'Componenti', icon: Puzzle, to: '/components' },
   { label: 'Documentazione', icon: BookOpen, to: '/docs' },
-  { label: 'Impostazioni', icon: Settings, to: '/settings' }
+  { label: 'Impostazioni', icon: Settings, to: '/settings' },
+  { label: 'Notify', icon: Bell, to: '/notify' }
 ]
 
 const toggleDrawer = () => {

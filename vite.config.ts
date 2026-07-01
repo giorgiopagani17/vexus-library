@@ -23,6 +23,7 @@ export default defineConfig({
       scss: {
         additionalData: `
           @import "@/css/variables.scss";
+          @import "@/css/library.variables.scss";
         `
       }
     }

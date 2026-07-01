@@ -3,8 +3,8 @@
     <div class="docs-header">
       <h1>Notify</h1>
       <p class="subtitle">
-        Sistema di notifiche toast completamente personalizzabile: tipi, posizioni,
-        azioni custom e durata configurabile.
+        Sistema di notifiche toast completamente personalizzabile: tipi, colori,
+        posizioni, contenuto HTML, stati di caricamento e durata configurabile.
       </p>
     </div>
 
@@ -18,7 +18,7 @@
     <!-- Tipi -->
     <section class="docs-section">
       <h2>Tipi</h2>
-      <p>Cinque varianti predefinite, ognuna con icona e colore automatico.</p>
+      <p>Cinque varianti predefinite, ognuna con icona e colore automatico (background pieno del colore del tipo, testo bianco).</p>
 
       <div class="example-row">
         <DesignButton text="Default" @click="notify({ message: 'Notifica generica' })" />
@@ -29,6 +29,52 @@
       </div>
 
       <DesignCodeBlock :code="typesCode" />
+    </section>
+
+    <!-- Colori custom -->
+    <section class="docs-section">
+      <h2>Colori custom</h2>
+      <p>
+        Ogni notifica è completamente ricolorabile tramite l'oggetto <code>colors</code>.
+        Le chiavi non specificate mantengono il default del <code>type</code> scelto.
+      </p>
+
+      <div class="example-row">
+        <DesignButton
+          text="Colore custom"
+          variant="ghost"
+          @click="notify({
+            message: 'Ho un colore tutto mio!',
+            colors: {
+              background: '#7c3aed',
+              text: 'rgba(255,255,255,0.85)',
+              title: '#ffffff',
+              icon: '#ffffff',
+              accent: '#ffffff',
+              badgeBackground: '#ffffff',
+              badgeText: '#7c3aed'
+            }
+          })"
+        />
+        <DesignButton
+          text="Override parziale su type"
+          variant="ghost"
+          @click="notify({
+            type: 'success',
+            message: 'Success ma con sfondo diverso',
+            colors: { background: '#0f766e', shadow: 'rgba(15,118,110,0.35)' }
+          })"
+        />
+      </div>
+
+      <DesignCodeBlock :code="colorsCode" />
+
+      <DesignPropsTable
+        :columns="colorColumns"
+        :rows="colorKeys"
+        :widths="['160px', '1fr']"
+        style="margin-top: 16px;"
+      />
     </section>
 
     <!-- Titolo -->
@@ -51,10 +97,68 @@
       <DesignCodeBlock :code="titleCode" />
     </section>
 
+    <!-- Contenuto HTML -->
+    <section class="docs-section">
+      <h2>Contenuto HTML</h2>
+      <p>
+        Imposta <code>html: true</code> per renderizzare markup dentro il messaggio
+        (link, grassetto, liste...). <strong>Attenzione:</strong> sanitizza sempre
+        l'HTML se contiene input proveniente dall'utente, per evitare XSS.
+      </p>
+
+      <div class="example-row">
+        <DesignButton
+          text="Notifica con HTML"
+          variant="ghost"
+          @click="notify({
+            type: 'info',
+            html: true,
+            message: 'Il piano <b>Pro</b> sta per scadere. <a href=\'/billing\'>Rinnova ora</a>.',
+            duration: 6000
+          })"
+        />
+      </div>
+
+      <DesignCodeBlock :code="htmlCode" />
+    </section>
+
+    <!-- Loading / Spinner -->
+    <section class="docs-section">
+      <h2>Stato di caricamento</h2>
+      <p>
+        Imposta <code>loading: true</code> per mostrare uno spinner al posto dell'icona,
+        utile per operazioni asincrone. Usa <code>update(id, patch)</code> per aggiornare
+        la notifica una volta completata l'operazione.
+      </p>
+
+      <div class="example-row">
+        <DesignButton text="Simula upload" variant="primary" @click="simulateLoading" />
+      </div>
+
+      <DesignCodeBlock :code="loadingCode" />
+    </section>
+
+    <!-- Progress bar -->
+    <section class="docs-section">
+      <h2>Barra di progresso</h2>
+      <p>
+        Le notifiche con <code>duration &gt; 0</code> mostrano automaticamente una barra
+        che indica il tempo rimanente prima della chiusura. Disattivabile con
+        <code>progress: false</code>. Passa il mouse sopra la notifica per mettere in pausa il countdown.
+      </p>
+
+      <div class="example-row">
+        <DesignButton text="Con progress bar" variant="ghost" @click="notify({ message: 'Mi chiudo tra poco...', duration: 5000, progress: true })" />
+        <DesignButton text="Senza progress bar" variant="ghost" @click="notify({ message: 'Nessuna barra qui', duration: 5000 })" />
+      </div>
+
+      <DesignCodeBlock :code="progressCode" />
+    </section>
+
     <!-- Posizione -->
     <section class="docs-section">
       <h2>Posizione</h2>
-      <p>Ogni notifica può apparire in una delle 6 posizioni dello schermo.</p>
+      <p>Ogni notifica può apparire in una delle 9 posizioni dello schermo.</p>
 
       <div class="example-grid">
         <DesignButton
@@ -100,8 +204,8 @@
             message: 'Stai per eliminare questo elemento.',
             duration: 0,
             actions: [
-              { label: 'Annulla', handler: () => {} },
-              { label: 'Elimina', color: '#c10015', handler: () => notify({ type: 'success', message: 'Elemento eliminato.' }) }
+              { label: 'Annulla', action: () => {} },
+              { label: 'Elimina', color: '#ffffff', action: () => notify({ type: 'success', message: 'Elemento eliminato.' }) }
             ]
           })"
         />
@@ -126,6 +230,34 @@
       <DesignCodeBlock :code="iconCode" />
     </section>
 
+    <!-- Size custom -->
+    <section class="docs-section">
+      <h2>Dimensioni custom</h2>
+      <p>
+        Regola indipendentemente la dimensione di icona, testo e titolo tramite
+        <code>iconSize</code>, <code>textSize</code> e <code>titleSize</code> (in px).
+      </p>
+
+      <div class="example-row">
+        <DesignButton
+          text="Notifica grande"
+          variant="ghost"
+          @click="notify({
+            type: 'info',
+            title: 'Titolo grande',
+            message: 'Testo ingrandito per dare più risalto.',
+            iconSize: 32,
+            titleSize: 18,
+            textSize: 15,
+            closeButtonSize: 24,
+            duration: 6000
+          })"
+        />
+      </div>
+
+      <DesignCodeBlock :code="sizeCode" />
+    </section>
+
     <!-- Dismiss -->
     <section class="docs-section">
       <h2>Chiusura programmatica</h2>
@@ -142,20 +274,11 @@
     <!-- Props table -->
     <section class="docs-section">
       <h2>Opzioni disponibili</h2>
-      <div class="props-table">
-        <div class="props-row props-row--header">
-          <span>Prop</span>
-          <span>Tipo</span>
-          <span>Default</span>
-          <span>Descrizione</span>
-        </div>
-        <div v-for="prop in props" :key="prop.name" class="props-row">
-          <span class="prop-name">{{ prop.name }}</span>
-          <span class="prop-type">{{ prop.type }}</span>
-          <span class="prop-default">{{ prop.default }}</span>
-          <span class="prop-desc">{{ prop.desc }}</span>
-        </div>
-      </div>
+      <DesignPropsTable
+        :columns="generalPropsColumns"
+        :rows="generalProps"
+        :widths="['130px', '200px', '90px', '1fr']"
+      />
     </section>
   </div>
 </template>
@@ -165,11 +288,16 @@ import { Sparkles } from 'lucide-vue-next'
 import { useNotify } from '@/Library/composables/Notify/useNotify'
 import DesignButton from '@/Docs/components/Buttons/DesignButton.vue'
 import DesignCodeBlock from '@/Docs/components/Utils/DesignCodeBlock.vue'
+import DesignPropsTable from '@/Docs/components/Utils/DesignPropsTable.vue'
+import { generalPropsColumns, generalProps } from '@/Docs/props/Notify/GeneralProps'
+import { colorColumns, colorKeys } from '@/Docs/props/Notify/ColorsProps'
+import { setupCode, typesCode, colorsCode, titleCode, htmlCode, loadingCode, progressCode, positionCode, durationCode, actionsCode, iconCode, sizeCode, dismissCode } from '@/Docs/code/Notify/NotifyCodeExamples'
 
-const { notify, dismiss, dismissAll } = useNotify()
+const { notify, dismiss, dismissAll, update } = useNotify()
 
 const positions = [
   'top-left', 'top-center', 'top-right',
+  'center-left', 'center-center', 'center-right',
   'bottom-left', 'bottom-center', 'bottom-right'
 ]
 
@@ -178,76 +306,25 @@ const programmaticDismiss = () => {
   setTimeout(() => dismiss(id), 2000)
 }
 
-const props = [
-  { name: 'message', type: 'string', default: "''", desc: 'Testo principale della notifica' },
-  { name: 'title', type: 'string | null', default: 'null', desc: 'Titolo opzionale sopra il messaggio' },
-  { name: 'type', type: "'default' | 'success' | 'error' | 'warning' | 'info'", default: "'default'", desc: 'Variante visiva con icona/colore automatico' },
-  { name: 'duration', type: 'number', default: '4000', desc: 'Tempo in ms prima della chiusura automatica. 0 = persistente' },
-  { name: 'position', type: "'top-left' | 'top-center' | 'top-right' | 'bottom-left' | 'bottom-center' | 'bottom-right'", default: "'bottom-right'", desc: 'Posizione sullo schermo' },
-  { name: 'icon', type: 'Component | null', default: 'null', desc: 'Icona custom, sovrascrive quella automatica' },
-  { name: 'actions', type: 'Array<{ label, handler, color?, closeOnClick? }>', default: '[]', desc: 'Bottoni interattivi dentro la notifica' },
-  { name: 'closable', type: 'boolean', default: 'true', desc: 'Mostra/nasconde il pulsante di chiusura manuale' },
-  { name: 'onClose', type: '() => void | null', default: 'null', desc: 'Callback eseguita alla chiusura' }
-]
+const simulateLoading = () => {
+  const id = notify({
+    type: 'default',
+    message: 'Caricamento file in corso...',
+    loading: true,
+    duration: 0,
+    closable: false
+  })
 
-const setupCode = `// File.vue
-<script setup>
-import NotifyContainer from '@/components/NotifyContainer.vue'
-<\/script>`
-
-const typesCode = `const { notify } = useNotify()
-
-notify({ message: 'Notifica generica' })
-notify({ type: 'success', message: 'Operazione completata!' })
-notify({ type: 'error', message: 'Qualcosa è andato storto.' })
-notify({ type: 'warning', message: 'Attenzione, controlla i dati.' })
-notify({ type: 'info', message: 'Nuovo aggiornamento disponibile.' })`
-
-const titleCode = `notify({
-  type: 'success',
-  title: 'Salvato!',
-  message: 'Le modifiche sono state salvate correttamente.'
-})`
-
-const positionCode = `notify({ message: 'Ciao!', position: 'top-center' })
-notify({ message: 'Ciao!', position: 'bottom-left' })
-// ... e le altre 4 posizioni disponibili`
-
-const durationCode = `notify({ message: 'Scompare in fretta', duration: 1500 })
-notify({ message: 'Resta più a lungo', duration: 8000 })
-notify({ message: 'Chiudimi manualmente', duration: 0 }) // persistente`
-
-const actionsCode = `notify({
-  type: 'warning',
-  message: 'Stai per eliminare questo elemento.',
-  duration: 0,
-  actions: [
-    { label: 'Annulla', handler: () => console.log('annullato') },
-    {
-      label: 'Elimina',
-      color: '#c10015',
-      handler: () => console.log('eliminato')
-    }
-  ]
-})`
-
-const iconCode = `import { Sparkles } from 'lucide-vue-next'
-
-notify({
-  message: 'Nuova funzionalità disponibile!',
-  icon: Sparkles,
-  position: 'top-center'
-})`
-
-const dismissCode = `const { notify, dismiss, dismissAll } = useNotify()
-
-// notify() ritorna un id univoco
-const id = notify({ message: 'Mi chiuderò tra 2 secondi...', duration: 0 })
-
-setTimeout(() => dismiss(id), 2000)
-
-// oppure chiudi tutte le notifiche attive
-dismissAll()`
+  setTimeout(() => {
+    update(id, {
+      type: 'success',
+      loading: false,
+      message: 'File caricato con successo!',
+      duration: 3000,
+      closable: true
+    })
+  }, 2500)
+}
 </script>
 
 <style lang="scss" scoped>
@@ -323,62 +400,5 @@ dismissAll()`
   border: 1px solid rgba($primary, 0.12);
   background: rgba(255, 255, 255, 0.02);
   margin-bottom: 16px;
-}
-
-.props-table {
-  border-radius: 14px;
-  border: 1px solid rgba($primary, 0.15);
-  overflow: hidden;
-}
-
-.props-row {
-  display: grid;
-  grid-template-columns: 130px 200px 90px 1fr;
-  gap: 12px;
-  padding: 12px 16px;
-  font-size: 13px;
-  border-bottom: 1px solid rgba($primary, 0.08);
-
-  &:last-child {
-    border-bottom: none;
-  }
-
-  &--header {
-    background: rgba($primary, 0.08);
-    font-weight: 700;
-    color: $primary;
-    font-size: 11px;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-  }
-}
-
-.prop-name {
-  font-family: 'Courier New', monospace;
-  color: $secondary;
-  font-weight: 600;
-}
-
-.prop-type {
-  font-family: 'Courier New', monospace;
-  opacity: 0.6;
-  font-size: 12px;
-}
-
-.prop-default {
-  opacity: 0.5;
-  font-family: 'Courier New', monospace;
-}
-
-.prop-desc {
-  opacity: 0.75;
-  line-height: 1.5;
-}
-
-@media (max-width: 640px) {
-  .props-row {
-    grid-template-columns: 1fr;
-    gap: 4px;
-  }
 }
 </style>

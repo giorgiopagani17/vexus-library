@@ -24,6 +24,7 @@ const { dismiss } = useNotify()
 
 const positions = [
   'top-left', 'top-center', 'top-right',
+  'center-left', 'center-center', 'center-right',
   'bottom-left', 'bottom-center', 'bottom-right'
 ]
 
@@ -42,11 +43,16 @@ const byPosition = (position) =>
   padding: 20px;
 
   &--top-left    { top: 0; left: 0; }
-  &--top-center  { top: 0; left: 50%; transform: translateX(-50%); }
-  &--top-right   { top: 0; right: 0; }
-  &--bottom-left { bottom: 0; left: 0; flex-direction: column-reverse; }
-  &--bottom-center { bottom: 0; left: 50%; transform: translateX(-50%); flex-direction: column-reverse; }
-  &--bottom-right  { bottom: 0; right: 0; flex-direction: column-reverse; }
+  &--top-center  { top: 0; left: 50%; transform: translateX(-50%); align-items: center; }
+  &--top-right   { top: 0; right: 0; align-items: flex-end; }
+
+  &--center-left    { top: 50%; left: 0; transform: translateY(-50%); }
+  &--center-center  { top: 50%; left: 50%; transform: translate(-50%, -50%); align-items: center; }
+  &--center-right   { top: 50%; right: 0; transform: translateY(-50%); align-items: flex-end; }
+
+  &--bottom-left   { bottom: 0; left: 0; flex-direction: column-reverse; }
+  &--bottom-center { bottom: 0; left: 50%; transform: translateX(-50%); flex-direction: column-reverse; align-items: center; }
+  &--bottom-right  { bottom: 0; right: 0; flex-direction: column-reverse; align-items: flex-end; }
 }
 
 .toast-enter-active,
