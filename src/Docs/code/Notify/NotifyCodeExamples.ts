@@ -109,6 +109,7 @@ export const sizeCode = `notify({
   iconSize: 32,
   titleSize: 18,
   textSize: 15,
+  radius: 20,
   closeButtonSize: 24,
   duration: 6000
 })`

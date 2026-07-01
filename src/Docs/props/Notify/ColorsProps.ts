@@ -9,7 +9,6 @@ export const colorKeys = [
   { name: 'text', desc: 'Colore del testo del messaggio' },
   { name: 'title', desc: 'Colore del titolo' },
   { name: 'icon', desc: "Colore dell'icona" },
-  { name: 'iconBackground', desc: "Sfondo dietro l'icona (cerchio)" },
   { name: 'accent', desc: 'Colore dei link/azioni' },
   { name: 'badgeBackground', desc: 'Sfondo del badge contatore duplicati' },
   { name: 'badgeText', desc: 'Colore testo del badge' },

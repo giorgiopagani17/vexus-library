@@ -126,7 +126,6 @@ const cssVars = computed(() => {
     text: '--toast-text',
     title: '--toast-title',
     icon: '--toast-icon',
-    iconBackground: '--toast-icon-bg',
     accent: '--toast-accent',
     badgeBackground: '--toast-badge-bg',
     badgeText: '--toast-badge-text',
@@ -144,6 +143,7 @@ const cssVars = computed(() => {
   vars['--toast-icon-size'] = toCssSize(n.iconSize) ?? '20px'
   vars['--toast-text-size'] = toCssSize(n.textSize) ?? '13px'
   vars['--toast-title-size'] = toCssSize(n.titleSize) ?? '13px'
+  vars['--toast-radius'] = toCssSize(n.radius) ?? '14px'
   vars['--toast-close-size'] = toCssSize(n.closeButtonSize) ?? '16px'
   vars['--toast-duration'] = `${n.duration}ms`
 
@@ -165,7 +165,6 @@ const handleAction = (action) => {
   --toast-text: rgba(255, 255, 255, 0.85);
   --toast-title: #ffffff;
   --toast-icon: #ffffff;
-  --toast-icon-bg: rgba(255, 255, 255, 0.15);
   --toast-accent: #ffffff;
   --toast-badge-bg: #ffffff;
   --toast-badge-text: #{$primary};
@@ -175,6 +174,7 @@ const handleAction = (action) => {
   --toast-icon-size: 20px;
   --toast-text-size: 13px;
   --toast-title-size: 13px;
+  --toast-radius: 14px;
   --toast-close-size: 16px;
 
   /* Container esterno: NIENTE overflow qui, così il badge può sporgere
@@ -221,7 +221,7 @@ da questo elemento, non viene mai tagliato. */
   gap: 12px;
   width: 100%;
   padding: 14px 16px;
-  border-radius: 14px;
+  border-radius: var(--toast-radius);
   background: var(--toast-bg);
   border: 1px solid var(--toast-border);
   box-shadow: 0 12px 32px var(--toast-shadow);
@@ -242,8 +242,6 @@ da questo elemento, non viene mai tagliato. */
   width: var(--toast-icon-size);
   height: var(--toast-icon-size);
   color: var(--toast-icon);
-  background: var(--toast-icon-bg);
-  border-radius: 50%;
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -370,7 +368,7 @@ quindi può sporgere sopra e a sinistra senza essere tagliato. */
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  border-radius: 999px;
+  border-radius: 100%;
   background: var(--toast-badge-bg);
   color: var(--toast-badge-text);
   font-size: 11px;

@@ -18,12 +18,10 @@ export type NotifySize = number | string
 
 export interface NotifyColors {
   background?: string
-  shadow?: string
   border?: string
   text?: string
   title?: string
   icon?: string
-  iconBackground?: string
   accent?: string
   badgeBackground?: string
   badgeText?: string
@@ -48,11 +46,12 @@ export interface NotifyOptions {
   duration?: number
   position?: NotifyPosition
   icon?: string | null
-  loading?: boolean             // mostra uno spinner al posto dell'icona
-  progress?: boolean            // mostra la barra di timeout (default: true se duration > 0)
+  loading?: boolean              // mostra uno spinner al posto dell'icona
+  progress?: boolean             // mostra la barra di timeout (default: true se duration > 0)
   iconSize?: NotifySize          // default 20 (px)
   textSize?: NotifySize          // default 13 (px)
   titleSize?: NotifySize         // default 13 (px)
+  radius?: NotifySize            // default 14 (px)
   closeButtonSize?: NotifySize   // default 16 (px)
   actions?: NotifyAction[]
   closable?: boolean
@@ -74,6 +73,7 @@ export interface Notification {
   iconSize: NotifySize
   textSize: NotifySize
   titleSize: NotifySize
+  radius: NotifySize
   closeButtonSize: NotifySize
   actions: NotifyAction[]
   closable: boolean
@@ -235,6 +235,7 @@ export function useNotify() {
     if (patch.iconSize !== undefined) notification.iconSize = patch.iconSize
     if (patch.textSize !== undefined) notification.textSize = patch.textSize
     if (patch.titleSize !== undefined) notification.titleSize = patch.titleSize
+    if (patch.radius !== undefined) notification.radius = patch.radius
     if (patch.closeButtonSize !== undefined) notification.closeButtonSize = patch.closeButtonSize
 
     if (patch.duration !== undefined) {
@@ -292,6 +293,7 @@ function pushNotification(
     iconSize: options.iconSize ?? 20,
     textSize: options.textSize ?? 13,
     titleSize: options.titleSize ?? 13,
+    radius: options.radius ?? 14,
     closeButtonSize: options.closeButtonSize ?? 16,
     actions: options.actions ?? [],
     closable: options.closable ?? true,
