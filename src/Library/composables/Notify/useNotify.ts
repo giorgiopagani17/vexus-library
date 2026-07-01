@@ -18,6 +18,7 @@ export type NotifySize = number | string
 
 export interface NotifyColors {
   background?: string
+  shadow?: string
   border?: string
   text?: string
   title?: string

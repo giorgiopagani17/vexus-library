@@ -7,59 +7,63 @@
     ]"
     :style="cssVars"
   >
-    <span v-if="notification.count > 1" class="toast-badge">{{ notification.count }}</span>
+    <!-- Badge FUORI dal box clippato, così non viene mai tagliato -->
+    <span v-if="notification.count > 1" class="toast-badge">{{ notification.count > 9 ? '9+' : notification.count }}</span>
 
-    <!-- Spinner (priorità massima) -->
-    <span v-if="notification.loading" class="toast-icon toast-icon--spinner">
-      <Loader2 :size="iconSizePx" class="spin" />
-    </span>
+    <!-- Wrapper con overflow:hidden, contiene tutto ciò che deve rispettare gli angoli arrotondati -->
+    <div class="toast-inner">
+      <!-- Spinner (priorità massima) -->
+      <span v-if="notification.loading" class="toast-icon toast-icon--spinner">
+        <Loader2 :size="iconSizePx" class="spin" />
+      </span>
 
-    <!-- Icona custom -->
-    <component
-      v-else-if="notification.icon"
-      :is="notification.icon"
-      :size="iconSizePx"
-      class="toast-icon"
-    />
-
-    <!-- Icona di default in base al type -->
-    <component
-      v-else-if="defaultIcon"
-      :is="defaultIcon"
-      :size="iconSizePx"
-      class="toast-icon"
-    />
-
-    <div class="toast-content">
-      <p v-if="notification.title" class="toast-title">{{ notification.title }}</p>
-
-      <!-- Contenuto HTML libero -->
-      <div v-if="notification.html" class="toast-message" v-html="notification.message" />
-      <p v-else class="toast-message">{{ notification.message }}</p>
-
-      <div v-if="notification.actions.length" class="toast-actions">
-        <button
-          v-for="(action, i) in notification.actions"
-          :key="i"
-          class="toast-action"
-          :style="action.color ? { color: action.color } : {}"
-          @click="handleAction(action)"
-        >
-          {{ action.label }}
-        </button>
-      </div>
-    </div>
-
-    <button v-if="notification.closable" class="toast-close" @click="$emit('close')">
-      <X :size="closeSizePx" />
-    </button>
-
-    <!-- Barra di progresso timeout -->
-    <div v-if="showProgress" class="toast-progress-track">
-      <div
-        class="toast-progress-bar"
-        :key="`${notification.id}-${notification.count}`"
+      <!-- Icona custom -->
+      <component
+        v-else-if="notification.icon"
+        :is="notification.icon"
+        :size="iconSizePx"
+        class="toast-icon"
       />
+
+      <!-- Icona di default in base al type -->
+      <component
+        v-else-if="defaultIcon"
+        :is="defaultIcon"
+        :size="iconSizePx"
+        class="toast-icon"
+      />
+
+      <div class="toast-content">
+        <p v-if="notification.title" class="toast-title">{{ notification.title }}</p>
+
+        <!-- Contenuto HTML libero -->
+        <div v-if="notification.html" class="toast-message" v-html="notification.message" />
+        <p v-else class="toast-message">{{ notification.message }}</p>
+
+        <div v-if="notification.actions.length" class="toast-actions">
+          <button
+            v-for="(action, i) in notification.actions"
+            :key="i"
+            class="toast-action"
+            :style="action.color ? { color: action.color } : {}"
+            @click="handleAction(action)"
+          >
+            {{ action.label }}
+          </button>
+        </div>
+      </div>
+
+      <button v-if="notification.closable" class="toast-close" @click="$emit('close')">
+        <X :size="closeSizePx" />
+      </button>
+
+      <!-- Barra di progresso timeout -->
+      <div v-if="showProgress" class="toast-progress-track">
+        <div
+          class="toast-progress-bar"
+          :key="`${notification.id}-${notification.count}`"
+        />
+      </div>
     </div>
   </div>
 </template>
@@ -117,6 +121,7 @@ const cssVars = computed(() => {
 
   const colorMap = {
     background: '--toast-bg',
+    shadow: '--toast-shadow',
     border: '--toast-border',
     text: '--toast-text',
     title: '--toast-title',
@@ -155,6 +160,7 @@ const handleAction = (action) => {
 .notify-toast {
   /* ===== default (type "default"): background pieno, testo bianco ===== */
   --toast-bg: #{$primary};
+  --toast-shadow: color-mix(in srgb, var(--toast-bg) 35%, transparent);
   --toast-border: transparent;
   --toast-text: rgba(255, 255, 255, 0.85);
   --toast-title: #ffffff;
@@ -164,7 +170,6 @@ const handleAction = (action) => {
   --toast-badge-bg: #ffffff;
   --toast-badge-text: #{$primary};
   --toast-close: rgba(255, 255, 255, 0.6);
-  --toast-shadow: rgba(0, 0, 0, 0.25);
   --toast-progress: rgba(255, 255, 255, 0.9);
   --toast-progress-track: rgba(255, 255, 255, 0.25);
   --toast-icon-size: 20px;
@@ -172,49 +177,61 @@ const handleAction = (action) => {
   --toast-title-size: 13px;
   --toast-close-size: 16px;
 
+  /* Container esterno: NIENTE overflow qui, così il badge può sporgere
+  senza essere clippato. Non ha background/padding/border-radius propri:
+  quelli vivono su .toast-inner. */
+  position: relative;
+  display: inline-block;
+  min-width: 280px;
+  max-width: 380px;
+  pointer-events: auto;
+
+  &--success {
+    --toast-bg: #{$positive};
+    --toast-badge-text: #{$positive};
+    --toast-shadow: #{rgba($positive, 0.35)};
+  }
+
+  &--error {
+    --toast-bg: #{$negative};
+    --toast-badge-text: #{$negative};
+    --toast-shadow: #{rgba($negative, 0.35)};
+  }
+
+  &--warning {
+    --toast-bg: #{$warning};
+    --toast-badge-text: #{$warning};
+    --toast-shadow: #{rgba($warning, 0.35)};
+  }
+
+  &--info {
+    --toast-bg: #{$info};
+    --toast-badge-text: #{$info};
+    --toast-shadow: #{rgba($info, 0.35)};
+  }
+}
+
+/* Wrapper interno: qui vivono background, bordo, ombra, angoli arrotondati
+e l'overflow:hidden necessario per la progress bar. Essendo il badge fuori
+da questo elemento, non viene mai tagliato. */
+.toast-inner {
   position: relative;
   display: flex;
   align-items: flex-start;
   gap: 12px;
-  min-width: 280px;
-  max-width: 380px;
+  width: 100%;
   padding: 14px 16px;
   border-radius: 14px;
   background: var(--toast-bg);
   border: 1px solid var(--toast-border);
   box-shadow: 0 12px 32px var(--toast-shadow);
-  pointer-events: auto;
-  overflow: hidden; /* necessario per la progress bar agli angoli arrotondati */
+  overflow: hidden;
 
-  &--has-progress {
+  .notify-toast--has-progress & {
     padding-bottom: 17px; /* spazio per la barra */
   }
 
-  &--success {
-    --toast-bg: #21ba45;
-    --toast-badge-text: #21ba45;
-    --toast-shadow: rgba(33, 186, 69, 0.35);
-  }
-
-  &--error {
-    --toast-bg: #c10015;
-    --toast-badge-text: #c10015;
-    --toast-shadow: rgba(193, 0, 21, 0.35);
-  }
-
-  &--warning {
-    --toast-bg: #f2a900;
-    --toast-badge-text: #f2a900;
-    --toast-shadow: rgba(242, 169, 0, 0.35);
-  }
-
-  &--info {
-    --toast-bg: #{$primary};
-    --toast-badge-text: #{$primary};
-    --toast-shadow: rgba(0, 0, 0, 0.25);
-  }
-
-  &:hover .toast-progress-bar {
+  .notify-toast:hover & .toast-progress-bar {
     animation-play-state: paused;
   }
 }
@@ -341,13 +358,15 @@ const handleAction = (action) => {
   }
 }
 
+/* Badge: ora è figlio diretto di .notify-toast (che non ha overflow:hidden),
+quindi può sporgere sopra e a sinistra senza essere tagliato. */
 .toast-badge {
   position: absolute;
-  top: -14px;
-  left: -8px;
+  top: -10px;
+  left: -10px;
   min-width: 22px;
   height: 22px;
-  padding: 0 6px;
+  padding: 0px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -368,7 +387,6 @@ const handleAction = (action) => {
   right: 0;
   height: 3px;
   background: var(--toast-progress-track);
-  overflow: hidden;
 }
 
 .toast-progress-bar {
