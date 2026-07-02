@@ -54,6 +54,7 @@ import { useRoute } from 'vue-router'
 import {
   Menu,
   Bell,
+  Phone,
   Home,
   Puzzle,
   BookOpen,
@@ -73,7 +74,8 @@ const menuItems = [
   { label: 'Componenti', icon: Puzzle, to: '/components' },
   { label: 'Documentazione', icon: BookOpen, to: '/docs' },
   { label: 'Impostazioni', icon: Settings, to: '/settings' },
-  { label: 'Notify', icon: Bell, to: '/notify' }
+  { label: 'Notify', icon: Bell, to: '/notify' },
+  { label: 'UseApi', icon: Phone, to: '/use-api' }
 ]
 
 const toggleDrawer = () => {

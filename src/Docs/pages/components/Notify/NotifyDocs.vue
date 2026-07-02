@@ -287,13 +287,13 @@
 
 <script setup>
 import { Sparkles } from 'lucide-vue-next'
-import { useNotify } from '@/Library/composables/Notify/useNotify'
+import { useNotify } from '@/Library/hooks/Notify/useNotify'
 import DesignButton from '@/Docs/components/Buttons/DesignButton.vue'
 import DesignCodeBlock from '@/Docs/components/Utils/DesignCodeBlock.vue'
 import DesignPropsTable from '@/Docs/components/Utils/DesignPropsTable.vue'
-import { generalPropsColumns, generalProps } from '@/Docs/props/Notify/GeneralProps'
-import { colorColumns, colorKeys } from '@/Docs/props/Notify/ColorsProps'
-import { setupCode, typesCode, colorsCode, titleCode, htmlCode, loadingCode, progressCode, positionCode, durationCode, actionsCode, iconCode, sizeCode, dismissCode } from '@/Docs/code/Notify/NotifyCodeExamples'
+import { generalPropsColumns, generalProps } from '@/Docs/metadata/props/Notify/notifyGeneralProps'
+import { colorColumns, colorKeys } from '@/Docs/metadata/props/Notify/notifyColorsProps'
+import { setupCode, typesCode, colorsCode, titleCode, htmlCode, loadingCode, progressCode, positionCode, durationCode, actionsCode, iconCode, sizeCode, dismissCode } from '@/Docs/metadata/code/Notify/NotifyCodeExamples'
 
 const { notify, dismiss, dismissAll, update } = useNotify()
 

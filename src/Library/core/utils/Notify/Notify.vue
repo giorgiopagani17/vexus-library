@@ -163,15 +163,15 @@ const handleAction = (action) => {
   --toast-bg: #{$primary};
   --toast-shadow: color-mix(in srgb, var(--toast-bg) 35%, transparent);
   --toast-border: transparent;
-  --toast-text: rgba(255, 255, 255, 0.85);
-  --toast-title: #ffffff;
-  --toast-icon: #ffffff;
-  --toast-accent: #ffffff;
-  --toast-badge-bg: #ffffff;
+  --toast-text: #{rgba($white, 0.85)};
+  --toast-title: #{$white};
+  --toast-icon: #{$white};
+  --toast-accent: #{$white};
+  --toast-badge-bg: #{$primary};
   --toast-badge-text: #{$primary};
-  --toast-close: rgba(255, 255, 255, 0.6);
-  --toast-progress: rgba(255, 255, 255, 0.9);
-  --toast-progress-track: rgba(255, 255, 255, 0.25);
+  --toast-close: #{rgba($white, 0.6)};
+  --toast-progress: #{rgba($white, 0.9)};
+  --toast-progress-track: #{rgba($white, 0.25)};
   --toast-icon-size: 20px;
   --toast-text-size: 13px;
   --toast-title-size: 13px;
@@ -349,8 +349,8 @@ da questo elemento, non viene mai tagliato. */
   }
 
   &:hover {
-    color: #ffffff;
-    background: rgba(255, 255, 255, 0.15);
+    color: #{$white};
+    background: #{rgba($white, 0.15)};
   }
 }
 
@@ -372,7 +372,7 @@ quindi può sporgere sopra e a sinistra senza essere tagliato. */
   font-size: 11px;
   font-weight: 700;
   border: 2px solid var(--toast-bg);
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 4px 10px #{rgba($black, 0.2)};
   z-index: 100;
 }
 

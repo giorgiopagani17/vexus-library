@@ -22,6 +22,16 @@ export const routes: RouteRecordRaw[] = [
     ]
   },
   {
+    path: '/use-api',
+    children: [
+      {
+        path: '',
+        component: () => import('@/Docs/layouts/MainLayout.vue'),
+        children: [{ path: '', component: () => import('@/Docs/pages/components/Api/ApiDocs.vue') }],
+      }
+    ]
+  },
+  {
     path: '/:catchAll(.*)*',
     component: () => import('@/Docs/pages/ErrorNotFound.vue')
   }

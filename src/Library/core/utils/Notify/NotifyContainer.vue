@@ -17,8 +17,8 @@
 </template>
 
 <script setup>
-import { notifications, useNotify } from '@/Library/composables/Notify/useNotify'
-import Notify from '@/Library/components/Notify/Notify.vue'
+import { notifications, useNotify } from '@/Library/hooks/Notify/useNotify'
+import Notify from '@/Library/core/utils/Notify/Notify.vue'
 
 const { dismiss } = useNotify()
 
