@@ -167,7 +167,7 @@ const handleAction = (action) => {
   --toast-title: #{$white};
   --toast-icon: #{$white};
   --toast-accent: #{$white};
-  --toast-badge-bg: #{$primary};
+  --toast-badge-bg: #{$white};
   --toast-badge-text: #{$primary};
   --toast-close: #{rgba($white, 0.6)};
   --toast-progress: #{rgba($white, 0.9)};
