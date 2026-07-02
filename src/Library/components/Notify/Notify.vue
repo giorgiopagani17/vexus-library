@@ -232,10 +232,6 @@ da questo elemento, non viene mai tagliato. */
   .notify-toast--has-progress & {
     padding-bottom: 17px; /* spazio per la barra */
   }
-
-  .notify-toast:hover & .toast-progress-bar {
-    animation-play-state: paused;
-  }
 }
 
 .toast-icon {
