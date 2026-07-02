@@ -12,6 +12,16 @@ export const routes: RouteRecordRaw[] = [
     ]
   },
   {
+    path: '/button',
+    children: [
+      {
+        path: '',
+        component: () => import('@/Docs/layouts/MainLayout.vue'),
+        children: [{ path: '', component: () => import('@/Docs/pages/components/Buttons/ButtonDocs.vue') }],
+      }
+    ]
+  },
+  {
     path: '/notify',
     children: [
       {
