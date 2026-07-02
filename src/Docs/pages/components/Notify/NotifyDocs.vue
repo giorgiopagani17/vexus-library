@@ -293,7 +293,7 @@ import DesignCodeBlock from '@/Docs/components/Utils/DesignCodeBlock.vue'
 import DesignPropsTable from '@/Docs/components/Utils/DesignPropsTable.vue'
 import { generalPropsColumns, generalProps } from '@/Docs/metadata/props/Notify/notifyGeneralProps'
 import { colorColumns, colorKeys } from '@/Docs/metadata/props/Notify/notifyColorsProps'
-import { setupCode, typesCode, colorsCode, titleCode, htmlCode, loadingCode, progressCode, positionCode, durationCode, actionsCode, iconCode, sizeCode, dismissCode } from '@/Docs/metadata/code/Notify/NotifyCodeExamples'
+import { setupCode, typesCode, colorsCode, titleCode, htmlCode, loadingCode, progressCode, positionCode, durationCode, actionsCode, iconCode, sizeCode, dismissCode } from '@/Docs/metadata/code/Notify/notifyCodeExamples'
 
 const { notify, dismiss, dismissAll, update } = useNotify()
 

@@ -161,7 +161,7 @@ import {
   refreshCode,
   blobCode,
   configCode,
-} from '@/Docs/metadata/code/Api/ApiCodeExamples'
+} from '@/Docs/metadata/code/Api/apiCodeExamples'
 
 const { request } = useApi()
 
