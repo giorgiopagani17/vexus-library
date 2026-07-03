@@ -101,6 +101,7 @@ export const colorsOverrideCode = `<VxInput
     focusShadow: 'rgba(124, 58, 237, 0.22)',
     placeholder: '#a78bfa'
   }"
+  :icon="Search"
   placeholder="Full custom colors"
   block
 />
