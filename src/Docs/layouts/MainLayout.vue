@@ -5,7 +5,9 @@
         <Menu :size="20" />
       </button>
 
-      <h1 class="title">{{ libraryName }}</h1>
+      <div class="image-wrapper">
+        <img :src="VexusLogo" class="logo-image" alt="Vexus Logo" />
+      </div>
 
       <div class="header-actions">
         <DesignLanguageSwitcher />
@@ -16,12 +18,6 @@
       class="sidebar"
       :class="{ 'sidebar--mini': miniState, 'sidebar--hidden': !drawerOpen }"
     >
-      <div class="logo-wrap">
-        <span class="logo-bracket">&lt;</span>
-        <span class="logo-text">{{ miniState ? libraryNameShort : libraryName }}</span>
-        <span class="logo-bracket">/&gt;</span>
-      </div>
-
       <nav class="menu">
         <RouterLink
           v-for="item in menuItems"
@@ -51,6 +47,7 @@
 import { ref, computed } from 'vue'
 import DesignLanguageSwitcher from '@/Docs/components/Utils/DesignLanguageSwitcher.vue'
 import { useRoute } from 'vue-router'
+import VexusLogo from '/vexus_logo.png'
 import {
   Menu,
   MousePointerClick,
@@ -68,8 +65,6 @@ import {
 const route = useRoute()
 const drawerOpen = ref(true)
 const miniState = ref(false)
-const libraryName = __APP_NAME__ || 'Vexus'
-const libraryNameShort = __APP_NAME_SHORT__ || 'V'
 
 const menuItems = [
   { label: 'Home', icon: Home, to: '/' },
@@ -100,6 +95,7 @@ const toggleDrawer = () => {
   height: 64px;
   display: flex;
   align-items: center;
+  justify-content: space-between;
   gap: 16px;
   padding: 0 20px;
   background: rgba($tertiary, 0.85);
@@ -180,28 +176,16 @@ const toggleDrawer = () => {
   }
 }
 
-.logo-wrap {
+.image-wrapper {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 4px;
-  padding: 24px 0;
-  font-size: 18px;
-  font-weight: 800;
-  white-space: nowrap;
-  overflow: hidden;
 }
 
-.logo-text {
-  background: linear-gradient(135deg, $primary, $secondary);
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
-}
-
-.logo-bracket {
-  opacity: 0.4;
-  font-weight: 400;
+.logo-image {
+  width: 34px;
+  height: 34px;
+  object-fit: cover;
 }
 
 .menu {

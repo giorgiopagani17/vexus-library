@@ -109,6 +109,7 @@ export const colorsOverrideCode = `<VxInput
   :colors="{
     background: 'white',
     border: '#4ade80',
+    text: '#16a34a',
     focusBorder: '#7c3aed',
     placeholder: '#a78bfa'
   }"

@@ -480,6 +480,7 @@
           :colors="{
             background: 'white',
             border: '#4ade80',
+            text: '#16a34a',
             focusBorder: '#7c3aed',
             placeholder: '#a78bfa'
           }"
@@ -521,13 +522,13 @@
     <section class="docs-section">
       <h2>Componenti collegati</h2>
       <p>
-        <code>Input</code> condivide il proprio "chrome" (label, bordo,
+        <code>VxInput</code> condivide il proprio "chrome" (label, bordo,
         varianti, focus, icone, hint/error) con
         <code>VxFieldWrapper</code>, lo stesso wrapper usato dai componenti
         dedicati per date, range di date, data+ora, range di data+ora, orari,
         colore e slider. Se ti serve uno di quei tipi, guarda la
         documentazione del componente specifico invece di forzarlo su
-        <code>Input</code>.
+        <code>VxInput</code>.
       </p>
     </section>
 
