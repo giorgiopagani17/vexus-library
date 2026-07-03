@@ -1,12 +1,12 @@
 import { useVxNotify } from '@/Library/hooks/Notify/useVxNotify';
-import { useApiConfig } from '@/Library/core/composables/Api/apiConfig';
+import { VxApiConfig } from '@/Library/core/composables/Api/apiConfig';
 import type { ApiOptions, ApiResponse, ApiBlobResponse } from '@/Library/core/types/apiTypes';
 
 // Promise di refresh globale (modulo), condivisa tra tutte le chiamate concorrenti
 let globalRefreshPromise: Promise<boolean> | null = null;
 
-export function useApi() {
-  const config = useApiConfig();
+export function useVxApi() {
+  const config = VxApiConfig();
   const { VxNotify, update, dismiss } = useVxNotify();
 
   const t = (key: string, fallback: string) =>
@@ -51,7 +51,7 @@ export function useApi() {
         await config.refreshAccessToken!();
         return true;
       } catch (error) {
-        console.error('[useApi] Refresh fallito:', error);
+        console.error('[useVxApi] Refresh fallito:', error);
         return false;
       }
     })();
@@ -93,7 +93,7 @@ export function useApi() {
     return null;
   }
 
-  async function request<TBody = unknown, TData = unknown>(
+  async function VxRequest<TBody = unknown, TData = unknown>(
     endpoint: string,
     options: ApiOptions<TBody> = {},
     retry = true
@@ -163,7 +163,7 @@ export function useApi() {
               dismiss(loadingId);
               loadingId = null;
             }
-            return await request(endpoint, options, false);
+            return await VxRequest(endpoint, options, false);
           }
         }
         if (loadingId !== null) {
@@ -266,5 +266,5 @@ export function useApi() {
     }
   }
 
-  return { request };
+  return { VxRequest };
 }

@@ -47,7 +47,7 @@ export const routes: RouteRecordRaw[] = [
       {
         path: '',
         component: () => import('@/Docs/layouts/MainLayout.vue'),
-        children: [{ path: '', component: () => import('@/Docs/pages/components/Api/ApiDocs.vue') }],
+        children: [{ path: '', component: () => import('@/Docs/pages/components/Api/VxApiDocs.vue') }],
       }
     ]
   },

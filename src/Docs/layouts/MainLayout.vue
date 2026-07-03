@@ -74,7 +74,7 @@ const menuItems = [
   { label: 'VxButton', icon: MousePointerClick, to: '/button' },
   { label: 'VxInput', icon: TextCursorInput, to: '/input' },
   { label: 'VxNotify', icon: Bell, to: '/notify' },
-  { label: 'UseApi', icon: Phone, to: '/use-api' }
+  { label: 'VxApi', icon: Phone, to: '/use-api' }
 ]
 
 const toggleDrawer = () => {

@@ -15,34 +15,34 @@ app.use(createApiClient({
 }))`
 
 export const usageCode = `// In qualsiasi componente, senza altro setup
-import { useApi } from 'vexus'
+import { useVxApi } from 'vexus'
 
-const { request } = useApi()
+const { VxRequest } = useVxApi()
 
-const users = await request('users', { method: 'GET' })`
+const users = await VxRequest('users', { method: 'GET' })`
 
-export const getPostCode = `const { request } = useApi()
+export const getPostCode = `const { VxRequest } = useVxApi()
 
 // GET con query params
-const list = await request('users', {
+const list = await VxRequest('users', {
   method: 'GET',
   query: { page: 1, active: true }
 })
 
 // GET con path params
-const user = await request('users/:id', {
+const user = await VxRequest('users/:id', {
   method: 'GET',
   pathParams: { id: 42 }
 })
 
 // POST
-const created = await request('users', {
+const created = await VxRequest('users', {
   method: 'POST',
   body: { name: 'Giorgio', role: 'admin' }
 })`
 
 export const notifyCode = `// Notify automatica di successo/errore
-await request('users', {
+await VxRequest('users', {
   method: 'POST',
   body: payload,
   showNotify: true,
@@ -51,7 +51,7 @@ await request('users', {
 })
 
 // Notify solo in caso di errore
-await request('users/:id', {
+await VxRequest('users/:id', {
   method: 'DELETE',
   pathParams: { id: 42 },
   showOnlyErroNotify: true,
@@ -62,7 +62,7 @@ export const messagePathCode = `// Se la struttura di errore/successo del backen
 // non è quella di default (error.message / data.message),
 // indica dove trovarla con un path dot-notation
 
-await request('users', {
+await VxRequest('users', {
   method: 'POST',
   body: payload,
   showNotify: true,
@@ -71,7 +71,7 @@ await request('users', {
 })
 
 // Funziona anche con indici di array
-await request('bulk-import', {
+await VxRequest('bulk-import', {
   method: 'POST',
   body: rows,
   showOnlyErroNotify: true,
@@ -80,7 +80,7 @@ await request('bulk-import', {
 
 export const loadingCode = `// Notify persistente durante la chiamata, si trasforma
 // automaticamente in success/error al termine
-await request('reports/export', {
+await VxRequest('reports/export', {
   method: 'GET',
   showNotifyLoading: true,
   loadingMessage: 'Generazione report in corso...',
@@ -89,20 +89,20 @@ await request('reports/export', {
 
 export const refreshCode = `// Su 401: se doRefresh non è false, la libreria tenta
 // automaticamente il refresh del token e ripete la richiesta
-await request('users/me', { method: 'GET' })
+await VxRequest('users/me', { method: 'GET' })
 
 // Disattiva il refresh automatico per questa chiamata
-await request('public/ping', { method: 'GET', doRefresh: false })
+await VxRequest('public/ping', { method: 'GET', doRefresh: false })
 
 // Forza il logout su 401 anche a refresh disattivato
-await request('admin/check', {
+await VxRequest('admin/check', {
   method: 'GET',
   doRefresh: false,
   doLogout: true
 })`
 
 export const blobCode = `// Download di un file binario (excel, pdf, zip...)
-const { data } = await request('reports/:id/download', {
+const { data } = await VxRequest('reports/:id/download', {
   method: 'GET',
   pathParams: { id: reportId },
   expectBlob: true

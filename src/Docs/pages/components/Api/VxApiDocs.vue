@@ -1,7 +1,7 @@
 <template>
   <div class="docs-page">
     <div class="docs-header">
-      <h1>Api</h1>
+      <h1>VxApi</h1>
       <p class="subtitle">
         Client HTTP condiviso con gestione automatica di autenticazione,
         refresh token, notifiche e risposte binarie. Un'unica configurazione
@@ -26,7 +26,7 @@
     <section class="docs-section">
       <h2>Uso base</h2>
       <p>
-        In qualsiasi componente, senza altro setup, importi <code>useApi</code>
+        In qualsiasi componente, senza altro setup, importi <code>useVxApi</code>
         e chiami <code>request(endpoint, options)</code>.
       </p>
 
@@ -146,7 +146,7 @@
 </template>
 
 <script setup>
-import { useApi } from '@/Library/hooks/Api/useApi'
+import { useVxApi } from '@/Library/hooks/Api/useVxApi'
 import DesignButton from '@/Docs/components/Buttons/DesignButton.vue'
 import DesignCodeBlock from '@/Docs/components/Utils/DesignCodeBlock.vue'
 import DesignPropsTable from '@/Docs/components/Utils/DesignPropsTable.vue'
@@ -163,10 +163,10 @@ import {
   configCode,
 } from '@/Docs/metadata/code/Api/apiCodeExamples'
 
-const { request } = useApi()
+const { VxRequest } = useVxApi()
 
 const demoGet = () => {
-  request('users/1', {
+  VxRequest('users/1', {
     method: 'GET',
     showNotify: true,
     successMessage: 'Utente caricato con successo!',
@@ -175,7 +175,7 @@ const demoGet = () => {
 }
 
 const demoSuccess = () => {
-  request('users/1', {
+  VxRequest('users/1', {
     method: 'GET',
     showNotify: true,
     successMessage: 'Operazione completata!',
@@ -183,7 +183,7 @@ const demoSuccess = () => {
 }
 
 const demoError = () => {
-  request('questo-endpoint-non-esiste', {
+  VxRequest('questo-endpoint-non-esiste', {
     method: 'GET',
     showOnlyErroNotify: true,
     errorMessage: 'Endpoint non trovato (demo errore).',
@@ -191,7 +191,7 @@ const demoError = () => {
 }
 
 const demoLoading = () => {
-  request('users', {
+  VxRequest('users', {
     method: 'GET',
     showNotifyLoading: true,
     loadingMessage: 'Carico la lista utenti...',

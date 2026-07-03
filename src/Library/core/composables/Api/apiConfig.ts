@@ -23,7 +23,7 @@ export const API_CONFIG_KEY: InjectionKey<ApiClientConfig> = Symbol('vexus-api-c
  *   }));
  *
  * Da quel momento in poi, ogni componente Vexus (o del progetto) può fare
- * semplicemente `useApi().request(...)` senza sapere nulla di store/env.
+ * semplicemente `useVxApi().VxRequest(...)` senza sapere nulla di store/env.
  */
 export function createApiClient(config: ApiClientConfig) {
   return {
@@ -33,12 +33,12 @@ export function createApiClient(config: ApiClientConfig) {
   };
 }
 
-export function useApiConfig(): ApiClientConfig {
+export function VxApiConfig(): ApiClientConfig {
   const config = inject(API_CONFIG_KEY);
   if (!config) {
     throw new Error(
-      '[vexus] useApi: nessuna configurazione trovata. ' +
-      'Registra il plugin prima di usare useApi():\n' +
+      '[vexus] useVxApi: nessuna configurazione trovata. ' +
+      'Registra il plugin prima di usare useVxApi():\n' +
       "  app.use(createApiClient({ baseUrl, getAccessToken, ... }))"
     );
   }
