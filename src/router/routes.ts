@@ -17,7 +17,17 @@ export const routes: RouteRecordRaw[] = [
       {
         path: '',
         component: () => import('@/Docs/layouts/MainLayout.vue'),
-        children: [{ path: '', component: () => import('@/Docs/pages/components/Buttons/ButtonDocs.vue') }],
+        children: [{ path: '', component: () => import('@/Docs/pages/components/Buttons/VxButtonDocs.vue') }],
+      }
+    ]
+  },
+  {
+    path: '/input',
+    children: [
+      {
+        path: '',
+        component: () => import('@/Docs/layouts/MainLayout.vue'),
+        children: [{ path: '', component: () => import('@/Docs/pages/components/Input/VxInputDocs.vue') }],
       }
     ]
   },
@@ -27,7 +37,7 @@ export const routes: RouteRecordRaw[] = [
       {
         path: '',
         component: () => import('@/Docs/layouts/MainLayout.vue'),
-        children: [{ path: '', component: () => import('@/Docs/pages/components/Notify/NotifyDocs.vue') }],
+        children: [{ path: '', component: () => import('@/Docs/pages/components/Notify/VxNotifyDocs.vue') }],
       }
     ]
   },

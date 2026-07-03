@@ -54,6 +54,7 @@ import { useRoute } from 'vue-router'
 import {
   Menu,
   MousePointerClick,
+  TextCursorInput,
   Bell,
   Phone,
   Home,
@@ -75,8 +76,9 @@ const menuItems = [
   { label: 'Componenti', icon: Puzzle, to: '/components' },
   { label: 'Documentazione', icon: BookOpen, to: '/docs' },
   { label: 'Impostazioni', icon: Settings, to: '/settings' },
-  { label: 'Button', icon: MousePointerClick, to: '/button' },
-  { label: 'Notify', icon: Bell, to: '/notify' },
+  { label: 'VxButton', icon: MousePointerClick, to: '/button' },
+  { label: 'VxInput', icon: TextCursorInput, to: '/input' },
+  { label: 'VxNotify', icon: Bell, to: '/notify' },
   { label: 'UseApi', icon: Phone, to: '/use-api' }
 ]
 

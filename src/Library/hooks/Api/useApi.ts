@@ -1,4 +1,4 @@
-import { useNotify } from '@/Library/hooks/Notify/useNotify';
+import { useVxNotify } from '@/Library/hooks/Notify/useVxNotify';
 import { useApiConfig } from '@/Library/core/composables/Api/apiConfig';
 import type { ApiOptions, ApiResponse, ApiBlobResponse } from '@/Library/core/types/apiTypes';
 
@@ -7,7 +7,7 @@ let globalRefreshPromise: Promise<boolean> | null = null;
 
 export function useApi() {
   const config = useApiConfig();
-  const { notify, update, dismiss } = useNotify();
+  const { VxNotify, update, dismiss } = useVxNotify();
 
   const t = (key: string, fallback: string) =>
     config.translate ? config.translate(key, fallback) : fallback;
@@ -100,10 +100,10 @@ export function useApi() {
   ): Promise<ApiResponse<TData> | ApiBlobResponse | undefined> {
     const url = buildUrl(endpoint, options.pathParams, options.query);
 
-    // --- notify di loading (persistente, poi aggiornata a fine chiamata) ---
+    // --- VxNotify di loading (persistente, poi aggiornata a fine chiamata) ---
     let loadingId: number | null = null;
     if (options.showNotifyLoading) {
-      loadingId = notify({
+      loadingId = VxNotify({
         type: 'default',
         loading: true,
         duration: 0,
@@ -199,13 +199,13 @@ export function useApi() {
           const errorMsg = options.errorMessage || 'Request failed';
           finalizeLoading({ type: 'error', message: errorMsg });
           if (!hadLoadingNotify && options.showNotify) {
-            notify({ type: 'error', message: errorMsg });
+            VxNotify({ type: 'error', message: errorMsg });
           }
           throw { status: res.status, message: errorMsg, blob, contentType };
         }
         finalizeLoading({ type: 'success', message: options.successMessage || 'Completato' });
         if (!hadLoadingNotify && options.showNotify && !options.showOnlyErroNotify && options.successMessage) {
-          notify({ type: 'success', message: options.successMessage });
+          VxNotify({ type: 'success', message: options.successMessage });
         }
         return { data: blob, blob, status: res.status, contentType };
       }
@@ -234,7 +234,7 @@ export function useApi() {
 
         finalizeLoading({ type: 'error', message: errorMsg });
         if (!hadLoadingNotify && (options.showNotify || options.showOnlyErroNotify)) {
-          notify({ type: 'error', message: errorMsg });
+          VxNotify({ type: 'error', message: errorMsg });
         }
         throw mapped;
       }
@@ -243,7 +243,7 @@ export function useApi() {
         options.successMessage || getByPath(data, options.successMessagePath) || data?.message;
       finalizeLoading({ type: 'success', message: successMsg || 'Completato' });
       if (!hadLoadingNotify && options.showNotify && !options.showOnlyErroNotify && successMsg) {
-        notify({ type: 'success', message: successMsg });
+        VxNotify({ type: 'success', message: successMsg });
       }
 
       return mapped;
@@ -255,12 +255,12 @@ export function useApi() {
         throw error;
       }
 
-      // errore già gestito dal blocco !res.ok (notify già mostrata)
+      // errore già gestito dal blocco !res.ok (VxNotify già mostrato)
       const hasStatus = error && typeof error === 'object' && 'status' in error;
 
       if (!hadLoadingNotify && !hasStatus && (options.showNotify || options.showOnlyErroNotify)) {
         const message = options.errorMessage || 'Network error or parsing error';
-        notify({ type: 'error', message });
+        VxNotify({ type: 'error', message });
       }
       throw error;
     }

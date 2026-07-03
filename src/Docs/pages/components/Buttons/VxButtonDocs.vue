@@ -1,7 +1,7 @@
 <template>
   <div class="docs-page">
     <div class="docs-header">
-      <h1>Button</h1>
+      <h1>VxButton</h1>
       <p class="subtitle">
         Componente bottone flessibile con varianti, colori, icone, loading state,
         layout full-width e supporto slot avanzati.
@@ -21,10 +21,10 @@
       <p>Definisce il comportamento visivo del bottone: <code>solid</code>, <code>outline</code>, <code>ghost</code> o <code>text</code>.</p>
 
       <div class="example-row">
-        <Button @click="onClick">Solid (default)</Button>
-        <Button @click="onClick" variant="outline">Outline</Button>
-        <Button @click="onClick" variant="ghost">Ghost</Button>
-        <Button @click="onClick" variant="text">Text</Button>
+        <VxButton @click="onClick">Solid (default)</VxButton>
+        <VxButton @click="onClick" variant="outline">Outline</VxButton>
+        <VxButton @click="onClick" variant="ghost">Ghost</VxButton>
+        <VxButton @click="onClick" variant="text">Text</VxButton>
       </div>
 
       <DesignCodeBlock :code="variantCode" />
@@ -36,12 +36,12 @@
       <p>Definisce la palette del bottone tra le sei varianti predefinite.</p>
 
       <div class="example-row">
-        <Button @click="onClick" color="primary">Primary</Button>
-        <Button @click="onClick" color="secondary">Secondary</Button>
-        <Button @click="onClick" color="positive">Positive</Button>
-        <Button @click="onClick" color="negative">Negative</Button>
-        <Button @click="onClick" color="warning">Warning</Button>
-        <Button @click="onClick" color="info">Info</Button>
+        <VxButton @click="onClick" color="primary">Primary</VxButton>
+        <VxButton @click="onClick" color="secondary">Secondary</VxButton>
+        <VxButton @click="onClick" color="positive">Positive</VxButton>
+        <VxButton @click="onClick" color="negative">Negative</VxButton>
+        <VxButton @click="onClick" color="warning">Warning</VxButton>
+        <VxButton @click="onClick" color="info">Info</VxButton>
       </div>
 
       <DesignCodeBlock :code="colorCode" />
@@ -52,8 +52,8 @@
       </p>
 
       <div class="example-row">
-        <Button @click="onClick" color="#7c3aed">Hex</Button>
-        <Button @click="onClick" color="var(--vx-primary)">Palette via var</Button>
+        <VxButton @click="onClick" color="#7c3aed">Hex</VxButton>
+        <VxButton @click="onClick" color="var(--vx-primary)">Palette via var</VxButton>
       </div>
 
       <DesignCodeBlock :code="colorCustomCode" />
@@ -65,9 +65,9 @@
       <p>Tre dimensioni disponibili: <code>sm</code>, <code>md</code> (default) e <code>lg</code>.</p>
 
       <div class="example-row">
-        <Button @click="onClick" size="sm">Small</Button>
-        <Button @click="onClick" size="md">Medium</Button>
-        <Button @click="onClick" size="lg">Large</Button>
+        <VxButton @click="onClick" size="sm">Small</VxButton>
+        <VxButton @click="onClick" size="md">Medium</VxButton>
+        <VxButton @click="onClick" size="lg">Large</VxButton>
       </div>
 
       <DesignCodeBlock :code="sizeCode" />
@@ -79,24 +79,24 @@
       <p>Supporta icone via prop <code>icon</code> o tramite gli slot <code>icon-left</code> / <code>icon-right</code> per un controllo più fine.</p>
 
       <div class="example-row">
-        <Button @click="onClick" :icon="Sparkles" iconPosition="left">Left icon</Button>
-        <Button @click="onClick" :icon="Sparkles" iconPosition="right">Right icon</Button>
+        <VxButton @click="onClick" :icon="Sparkles" iconPosition="left">Left icon</VxButton>
+        <VxButton @click="onClick" :icon="Sparkles" iconPosition="right">Right icon</VxButton>
       </div>
 
       <div class="example-row">
-        <Button @click="onClick">
+        <VxButton @click="onClick">
           <template #icon-left>
             <Sparkles />
           </template>
           Slot left
-        </Button>
+        </VxButton>
 
-        <Button @click="onClick">
+        <VxButton @click="onClick">
           Slot right
           <template #icon-right>
             <Sparkles />
           </template>
-        </Button>
+        </VxButton>
       </div>
 
       <DesignCodeBlock :code="iconCode" />
@@ -108,8 +108,8 @@
       <p>Imposta <code>loading: true</code> per disabilitare il bottone e mostrare uno spinner interno al posto del contenuto.</p>
 
       <div class="example-row">
-        <Button @click="onClick" loading>Loading</Button>
-        <Button @click="onClick" :loading="true">Async action</Button>
+        <VxButton @click="onClick" loading>Loading</VxButton>
+        <VxButton @click="onClick" :loading="true">Async action</VxButton>
       </div>
 
       <DesignCodeBlock :code="loadingCode" />
@@ -121,7 +121,7 @@
       <p>Imposta <code>disabled: true</code> per bloccare l'interazione e ridurre l'opacità del bottone.</p>
 
       <div class="example-row">
-        <Button @click="onClick" disabled>Disabled</Button>
+        <VxButton @click="onClick" disabled>Disabled</VxButton>
       </div>
 
       <DesignCodeBlock :code="disabledCode" />
@@ -133,7 +133,7 @@
       <p>Il bottone occupa tutta la larghezza disponibile del contenitore con <code>block</code>.</p>
 
       <div class="example-row" style="flex-direction: column;">
-        <Button @click="onClick" block>Full width</Button>
+        <VxButton @click="onClick" block>Full width</VxButton>
       </div>
 
       <DesignCodeBlock :code="blockCode" />
@@ -145,9 +145,9 @@
       <p>Controlla il border radius del bottone tramite <code>radius</code> (numero in px o stringa) oppure la prop <code>pill</code> per bordi completamente arrotondati.</p>
 
       <div class="example-row">
-        <Button @click="onClick">Default</Button>
-        <Button @click="onClick" :radius="20">Custom</Button>
-        <Button @click="onClick" pill>Pill</Button>
+        <VxButton @click="onClick">Default</VxButton>
+        <VxButton @click="onClick" :radius="20">Custom</VxButton>
+        <VxButton @click="onClick" pill>Pill</VxButton>
       </div>
 
       <DesignCodeBlock :code="radiusCode" />
@@ -163,19 +163,19 @@
       </p>
 
       <div class="example-grid">
-        <Button @click="onClick" hoverEffect="brightness">Brightness</Button>
-        <Button @click="onClick" hoverEffect="scale">Scale</Button>
-        <Button @click="onClick" hoverEffect="lift">Lift</Button>
-        <Button @click="onClick" hoverEffect="glow">Glow</Button>
-        <Button @click="onClick" variant="text" hoverEffect="underline">Underline</Button>
-        <Button @click="onClick" hoverEffect="none">None</Button>
-        <Button
+        <VxButton @click="onClick" hoverEffect="brightness">Brightness</VxButton>
+        <VxButton @click="onClick" hoverEffect="scale">Scale</VxButton>
+        <VxButton @click="onClick" hoverEffect="lift">Lift</VxButton>
+        <VxButton @click="onClick" hoverEffect="glow">Glow</VxButton>
+        <VxButton @click="onClick" variant="text" hoverEffect="underline">Underline</VxButton>
+        <VxButton @click="onClick" hoverEffect="none">None</VxButton>
+        <VxButton
           @click="onClick"
           hoverEffect="custom"
           class="docs-hover-custom"
         >
           Custom
-        </Button>
+        </VxButton>
       </div>
 
       <DesignCodeBlock :code="hoverEffectCode" />
@@ -187,7 +187,7 @@
       <p>Se non passi contenuto testuale, il bottone si adatta automaticamente a una forma quadrata centrata sull'icona.</p>
 
       <div class="example-row">
-        <Button @click="onClick" :icon="Sparkles" />
+        <VxButton @click="onClick" :icon="Sparkles" />
       </div>
 
       <DesignCodeBlock :code="iconOnlyCode" />
@@ -204,7 +204,7 @@
       </p>
 
       <div class="example-row">
-        <Button
+        <VxButton
           @click="onClick"
           :colors="{
             background: '#7c3aed',
@@ -213,9 +213,9 @@
           }"
         >
           Custom
-        </Button>
+        </VxButton>
 
-        <Button
+        <VxButton
           @click="onClick"
           :colors="{
             background: 'positive',
@@ -223,7 +223,7 @@
           }"
         >
           Token override
-        </Button>
+        </VxButton>
       </div>
 
       <DesignCodeBlock :code="colorsOverrideCode" />
@@ -235,7 +235,7 @@
       <p>Il bottone emette <code>click</code> quando non è disabilitato né in stato di loading.</p>
 
       <div class="example-row">
-        <Button @click="onClick">Click me</Button>
+        <VxButton @click="onClick">Click me</VxButton>
       </div>
 
       <DesignCodeBlock :code="eventsCode" />
@@ -255,10 +255,10 @@
 
 <script setup>
 import { Sparkles } from 'lucide-vue-next'
-import Button from '@/Library/components/Button/Button.vue'
+import VxButton from '@/Library/components/Button/VxButton.vue'
 import DesignCodeBlock from '@/Docs/components/Utils/DesignCodeBlock.vue'
 import DesignPropsTable from '@/Docs/components/Utils/DesignPropsTable.vue'
-import { useNotify } from '@/Library/hooks/Notify/useNotify'
+import { useVxNotify } from '@/Library/hooks/Notify/useVxNotify'
 import { propsColumns, propsRows } from '@/Docs/metadata/props/Button/buttonGeneralProps'
 import {
   setupCode,
@@ -277,10 +277,10 @@ import {
   eventsCode
 } from '@/Docs/metadata/code/Button/buttonCodeExamples'
 
-const { notify } = useNotify()
+const { VxNotify } = useVxNotify()
 
 const onClick = () => {
-  notify({
+  VxNotify({
     title: 'Button clicked!',
     message: 'You have clicked the button.',
     color: 'positive',

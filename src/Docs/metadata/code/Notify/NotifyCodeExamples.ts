@@ -1,17 +1,19 @@
 export const setupCode = `// File.vue
 <script setup>
-import NotifyContainer from '@/components/NotifyContainer.vue'
+import { useVxNotify } from '@/Library/hooks/Notify/useVxNotify'
+
+const { VxNotify } = useVxNotify()
 <\/script>`
 
-export const typesCode = `const { notify } = useNotify()
+export const typesCode = `const { VxNotify } = useVxNotify()
 
-notify({ message: 'Notifica generica' })
-notify({ type: 'success', message: 'Operazione completata!' })
-notify({ type: 'error', message: 'Qualcosa è andato storto.' })
-notify({ type: 'warning', message: 'Attenzione, controlla i dati.' })
-notify({ type: 'info', message: 'Nuovo aggiornamento disponibile.' })`
+VxNotify({ message: 'Notifica generica' })
+VxNotify({ type: 'success', message: 'Operazione completata!' })
+VxNotify({ type: 'error', message: 'Qualcosa è andato storto.' })
+VxNotify({ type: 'warning', message: 'Attenzione, controlla i dati.' })
+VxNotify({ type: 'info', message: 'Nuovo aggiornamento disponibile.' })`
 
-export const colorsCode = `notify({
+export const colorsCode = `VxNotify({
   message: 'Ho un colore tutto mio!',
   colors: {
     background: '#7c3aed',
@@ -25,19 +27,19 @@ export const colorsCode = `notify({
 })
 
 // oppure override parziale sopra un type esistente
-notify({
+VxNotify({
   type: 'success',
   message: 'Success ma con sfondo diverso',
   colors: { background: '#0f766e', shadow: 'rgba(15,118,110,0.35)' }
 })`
 
-export const titleCode = `notify({
+export const titleCode = `VxNotify({
   type: 'success',
   title: 'Salvato!',
   message: 'Le modifiche sono state salvate correttamente.'
 })`
 
-export const htmlCode = `notify({
+export const htmlCode = `VxNotify({
   type: 'info',
   html: true,
   message: 'Il piano <b>Pro</b> sta per scadere. <a href="/billing">Rinnova ora</a>.',
@@ -46,11 +48,11 @@ export const htmlCode = `notify({
 
 // Sanitizza sempre input non fidato prima di passarlo, es:
 // import DOMPurify from 'dompurify'
-// notify({ html: true, message: DOMPurify.sanitize(userInput) })`
+// VxNotify({ html: true, message: DOMPurify.sanitize(userInput) })`
 
-export const loadingCode = `const { notify, update } = useNotify()
+export const loadingCode = `const { VxNotify, update } = useVxNotify()
 
-const id = notify({
+const id = VxNotify({
   message: 'Caricamento file in corso...',
   loading: true,
   duration: 0,      // resta aperta finché non la aggiorni
@@ -66,21 +68,21 @@ update(id, {
   closable: true
 })`
 
-export const progressCode = `notify({ message: 'Mi chiudo tra poco...', duration: 5000, progress: true })
-notify({ message: 'Nessuna barra qui', duration: 5000})
+export const progressCode = `VxNotify({ message: 'Mi chiudo tra poco...', duration: 5000, progress: true })
+VxNotify({ message: 'Nessuna barra qui', duration: 5000})
 
 // Passando il mouse sopra la notifica, il countdown si mette in pausa`
 
-export const positionCode = `notify({ message: 'Ciao!', position: 'top-center' })
-notify({ message: 'Ciao!', position: 'center-center' })
-notify({ message: 'Ciao!', position: 'bottom-left' })
+export const positionCode = `VxNotify({ message: 'Ciao!', position: 'top-center' })
+VxNotify({ message: 'Ciao!', position: 'center-center' })
+VxNotify({ message: 'Ciao!', position: 'bottom-left' })
 // ... e le altre 6 posizioni disponibili`
 
-export const durationCode = `notify({ message: 'Scompare in fretta', duration: 1500 })
-notify({ message: 'Resta più a lungo', duration: 8000 })
-notify({ message: 'Chiudimi manualmente', duration: 0 }) // persistente`
+export const durationCode = `VxNotify({ message: 'Scompare in fretta', duration: 1500 })
+VxNotify({ message: 'Resta più a lungo', duration: 8000 })
+VxNotify({ message: 'Chiudimi manualmente', duration: 0 }) // persistente`
 
-export const actionsCode = `notify({
+export const actionsCode = `VxNotify({
   type: 'warning',
   message: 'Stai per eliminare questo elemento.',
   duration: 0,
@@ -96,13 +98,13 @@ export const actionsCode = `notify({
 
 export const iconCode = `import { Sparkles } from 'lucide-vue-next'
 
-notify({
+VxNotify({
   message: 'Nuova funzionalità disponibile!',
   icon: Sparkles,
   position: 'top-center'
 })`
 
-export const sizeCode = `notify({
+export const sizeCode = `VxNotify({
   type: 'info',
   title: 'Titolo grande',
   message: 'Testo ingrandito per dare più risalto.',
@@ -115,10 +117,10 @@ export const sizeCode = `notify({
   duration: 6000
 })`
 
-export const dismissCode = `const { notify, dismiss, dismissAll } = useNotify()
+export const dismissCode = `const { VxNotify, dismiss, dismissAll } = useVxNotify()
 
-// notify() ritorna un id univoco
-const id = notify({ message: 'Mi chiuderò tra 2 secondi...', duration: 0 })
+// VxNotify() ritorna un id univoco
+const id = VxNotify({ message: 'Mi chiuderò tra 2 secondi...', duration: 0 })
 
 setTimeout(() => dismiss(id), 2000)
 

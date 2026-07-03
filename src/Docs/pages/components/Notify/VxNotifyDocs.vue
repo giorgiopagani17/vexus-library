@@ -1,7 +1,7 @@
 <template>
   <div class="docs-page">
     <div class="docs-header">
-      <h1>Notify</h1>
+      <h1>VxNotify</h1>
       <p class="subtitle">
         Sistema di notifiche toast completamente personalizzabile: tipi, colori,
         posizioni, contenuto HTML, stati di caricamento e durata configurabile.
@@ -11,7 +11,7 @@
     <!-- Installazione -->
     <section class="docs-section">
       <h2>Setup</h2>
-      <p>Importa il Notify nel <code>File.vue</code>:</p>
+      <p>Nel componente usa <code>useVxNotify()</code>: il container viene montato automaticamente al primo utilizzo.</p>
       <DesignCodeBlock :code="setupCode" />
     </section>
 
@@ -21,11 +21,11 @@
       <p>Cinque varianti predefinite, ognuna con icona e colore automatico (background pieno del colore del tipo, testo bianco).</p>
 
       <div class="example-row">
-        <DesignButton text="Default" @click="notify({ message: 'Notifica generica' })" />
-        <DesignButton text="Success" variant="primary" @click="notify({ type: 'success', message: 'Operazione completata!' })" />
-        <DesignButton text="Error" @click="notify({ type: 'error', message: 'Qualcosa è andato storto.' })" />
-        <DesignButton text="Warning" @click="notify({ type: 'warning', message: 'Attenzione, controlla i dati.' })" />
-        <DesignButton text="Info" @click="notify({ type: 'info', message: 'Nuovo aggiornamento disponibile.' })" />
+        <DesignButton text="Default" @click="VxNotify({ message: 'Notifica generica' })" />
+        <DesignButton text="Success" variant="primary" @click="VxNotify({ type: 'success', message: 'Operazione completata!' })" />
+        <DesignButton text="Error" @click="VxNotify({ type: 'error', message: 'Qualcosa è andato storto.' })" />
+        <DesignButton text="Warning" @click="VxNotify({ type: 'warning', message: 'Attenzione, controlla i dati.' })" />
+        <DesignButton text="Info" @click="VxNotify({ type: 'info', message: 'Nuovo aggiornamento disponibile.' })" />
       </div>
 
       <DesignCodeBlock :code="typesCode" />
@@ -43,7 +43,7 @@
         <DesignButton
           text="Colore custom"
           variant="ghost"
-          @click="notify({
+          @click="VxNotify({
             message: 'Ho un colore tutto mio!',
             colors: {
               background: '#7c3aed',
@@ -59,7 +59,7 @@
         <DesignButton
           text="Override parziale su type"
           variant="ghost"
-          @click="notify({
+          @click="VxNotify({
             type: 'success',
             message: 'Success ma con sfondo diverso',
             colors: { background: '#0f766e', shadow: 'rgba(15,118,110,0.35)' }
@@ -86,7 +86,7 @@
         <DesignButton
           text="Mostra con titolo"
           variant="primary"
-          @click="notify({
+          @click="VxNotify({
             type: 'success',
             title: 'Salvato!',
             message: 'Le modifiche sono state salvate correttamente.'
@@ -110,7 +110,7 @@
         <DesignButton
           text="Notifica con HTML"
           variant="ghost"
-          @click="notify({
+          @click="VxNotify({
             type: 'info',
             html: true,
             message: 'Il piano <b>Pro</b> sta per scadere. <a href=\'/billing\'>Rinnova ora</a>.',
@@ -148,8 +148,8 @@
       </p>
 
       <div class="example-row">
-        <DesignButton text="Con progress bar" variant="ghost" @click="notify({ message: 'Mi chiudo tra poco...', duration: 5000, progress: true })" />
-        <DesignButton text="Senza progress bar" variant="ghost" @click="notify({ message: 'Nessuna barra qui', duration: 5000 })" />
+        <DesignButton text="Con progress bar" variant="ghost" @click="VxNotify({ message: 'Mi chiudo tra poco...', duration: 5000, progress: true })" />
+        <DesignButton text="Senza progress bar" variant="ghost" @click="VxNotify({ message: 'Nessuna barra qui', duration: 5000 })" />
       </div>
 
       <DesignCodeBlock :code="progressCode" />
@@ -166,7 +166,7 @@
           :key="pos"
           :text="pos"
           variant="ghost"
-          @click="notify({ message: `Notifica da ${pos}`, position: pos })"
+          @click="VxNotify({ message: `Notifica da ${pos}`, position: pos })"
         />
       </div>
 
@@ -199,13 +199,13 @@
         <DesignButton
           text="Mostra con azioni"
           variant="primary"
-          @click="notify({
+          @click="VxNotify({
             type: 'warning',
             message: 'Stai per eliminare questo elemento.',
             duration: 0,
             actions: [
               { label: 'Annulla', action: () => {} },
-              { label: 'Elimina', color: '#ffffff', action: () => notify({ type: 'success', message: 'Elemento eliminato.' }) }
+              { label: 'Elimina', color: '#ffffff', action: () => VxNotify({ type: 'success', message: 'Elemento eliminato.' }) }
             ]
           })"
         />
@@ -223,7 +223,7 @@
         <DesignButton
           text="Icona personalizzata"
           variant="ghost"
-          @click="notify({ message: 'Nuova funzionalità disponibile!', icon: Sparkles, position: 'top-center' })"
+          @click="VxNotify({ message: 'Nuova funzionalità disponibile!', icon: Sparkles, position: 'top-center' })"
         />
       </div>
 
@@ -242,7 +242,7 @@
         <DesignButton
           text="Notifica grande"
           variant="ghost"
-          @click="notify({
+          @click="VxNotify({
             type: 'info',
             title: 'Titolo grande',
             message: 'Testo ingrandito per dare più risalto.',
@@ -263,7 +263,7 @@
     <!-- Dismiss -->
     <section class="docs-section">
       <h2>Chiusura programmatica</h2>
-      <p><code>notify()</code> ritorna un <code>id</code> che puoi usare per chiudere la notifica via codice.</p>
+      <p><code>VxNotify()</code> ritorna un <code>id</code> che puoi usare per chiudere la notifica via codice.</p>
 
       <div class="example-row">
         <DesignButton text="Apri e chiudi dopo 2s" variant="ghost" @click="programmaticDismiss" />
@@ -287,7 +287,7 @@
 
 <script setup>
 import { Sparkles } from 'lucide-vue-next'
-import { useNotify } from '@/Library/hooks/Notify/useNotify'
+import { useVxNotify } from '@/Library/hooks/Notify/useVxNotify'
 import DesignButton from '@/Docs/components/Buttons/DesignButton.vue'
 import DesignCodeBlock from '@/Docs/components/Utils/DesignCodeBlock.vue'
 import DesignPropsTable from '@/Docs/components/Utils/DesignPropsTable.vue'
@@ -295,7 +295,7 @@ import { generalPropsColumns, generalProps } from '@/Docs/metadata/props/Notify/
 import { colorColumns, colorKeys } from '@/Docs/metadata/props/Notify/notifyColorsProps'
 import { setupCode, typesCode, colorsCode, titleCode, htmlCode, loadingCode, progressCode, positionCode, durationCode, actionsCode, iconCode, sizeCode, dismissCode } from '@/Docs/metadata/code/Notify/notifyCodeExamples'
 
-const { notify, dismiss, dismissAll, update } = useNotify()
+const { VxNotify, dismiss, dismissAll, update } = useVxNotify()
 
 const positions = [
   'top-left', 'top-center', 'top-right',
@@ -304,12 +304,12 @@ const positions = [
 ]
 
 const programmaticDismiss = () => {
-  const id = notify({ message: 'Mi chiuderò tra 2 secondi...', duration: 0 })
+  const id = VxNotify({ message: 'Mi chiuderò tra 2 secondi...', duration: 0 })
   setTimeout(() => dismiss(id), 2000)
 }
 
 const simulateLoading = () => {
-  const id = notify({
+  const id = VxNotify({
     type: 'default',
     message: 'Caricamento file in corso...',
     loading: true,

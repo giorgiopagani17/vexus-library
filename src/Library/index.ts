@@ -7,4 +7,4 @@ export type {
   ApiResponse,
   ApiBlobResponse,
 } from '@/Library/core/types/apiTypes';
-export { useNotify } from '@/Library/hooks/Notify/useNotify';
+export { useVxNotify } from '@/Library/hooks/Notify/useVxNotify';

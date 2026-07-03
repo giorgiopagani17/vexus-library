@@ -125,8 +125,8 @@ function ensureMounted() {
    API
 ========================= */
 
-export function useNotify() {
-  const notify = (options: NotifyOptions) => {
+export function useVxNotify() {
+  const VxNotify = (options: NotifyOptions) => {
     ensureMounted()
 
     const message = options.message ?? ''
@@ -263,7 +263,7 @@ export function useNotify() {
   }
 
   return {
-    notify,
+    VxNotify,
     dismiss,
     dismissAll,
     update,

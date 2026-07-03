@@ -17,10 +17,10 @@
 </template>
 
 <script setup>
-import { notifications, useNotify } from '@/Library/hooks/Notify/useNotify'
+import { notifications, useVxNotify } from '@/Library/hooks/Notify/useVxNotify'
 import Notify from '@/Library/core/utils/Notify/Notify.vue'
 
-const { dismiss } = useNotify()
+const { dismiss } = useVxNotify()
 
 const positions = [
   'top-left', 'top-center', 'top-right',
