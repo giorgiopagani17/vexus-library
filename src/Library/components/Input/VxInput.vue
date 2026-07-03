@@ -53,6 +53,7 @@
         :id="fieldId"
         ref="inputRef"
         class="vx-input__field"
+        :class="{ 'vx-input__field--textarea': tag === 'textarea' }"
         :type="tag === 'input' ? effectiveType : undefined"
         :value="modelValue"
         :placeholder="placeholder"
@@ -530,13 +531,14 @@ function onFileChange(event) {
 .vx-input__field {
   flex: 1 1 auto;
   min-width: 0;
-  height: 100%;
+  width: 100%;
   border: none;
   outline: none;
   background: transparent;
   color: inherit;
   font: inherit;
   font-family: inherit;
+  box-sizing: border-box;
 
   &::placeholder {
     color: var(--input-placeholder, currentColor);
@@ -562,11 +564,18 @@ function onFileChange(event) {
   }
 }
 
-textarea.vx-input__field {
+textarea.vx-input__field,
+.vx-input__field--textarea {
+  display: block;
+  width: 100%;
+  min-width: 0;
+  min-height: 80px;
   height: auto;
-  align-self: stretch;
+  flex: 1 1 auto;
   resize: vertical;
   line-height: 1.5;
+  padding: 0;
+  margin: 0;
 }
 
 .vx-input__clear {
@@ -592,6 +601,7 @@ textarea.vx-input__field {
   display: flex;
   align-items: center;
   gap: 6px;
+  flex-shrink: 0;
 }
 
 .vx-input__toggle-btn {
@@ -646,8 +656,6 @@ textarea.vx-input__field {
   }
 }
 
-// ===== type="file" =====
-
 .vx-input__file {
   display: flex;
   align-items: center;
@@ -656,9 +664,6 @@ textarea.vx-input__field {
   min-width: 0;
 }
 
-// Tecnica "visually hidden": l'input resta nel DOM, focusabile da
-// tastiera e collegato alla label tramite `for`, ma invisibile. Il click
-// sulla label styled apre comunque il dialog nativo di selezione file.
 .vx-input__file-native {
   position: absolute;
   width: 1px;

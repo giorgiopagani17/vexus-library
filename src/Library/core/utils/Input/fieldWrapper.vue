@@ -221,6 +221,7 @@ const sizeVars = computed(() => {
   set('--vx-input-font-size', size.fontSize)
   set('--vx-input-icon-size', size.iconSize)
   set('--input-radius', size.radius)
+  set('--vx-input-multiline-min-height', size.multilineMinHeight)
 
   return vars
 })
@@ -236,6 +237,7 @@ defineExpose({ fieldId, isFocused })
   display: inline-flex;
   flex-direction: column;
   gap: var(--vx-input-wrapper-gap, 6px);
+  min-width: 0;
 
   &--block {
     display: flex;
@@ -253,16 +255,21 @@ defineExpose({ fieldId, isFocused })
   --input-radius: 10px;
   box-sizing: border-box;
   position: relative;
-  display: inline-flex;
+  display: flex;
   align-items: center;
   gap: var(--vx-input-gap, 8px);
   width: 100%;
+  min-width: 0;
   border: 1px solid var(--input-border, rgba(0, 0, 0, 0.15));
   border-radius: var(--input-radius);
   background: var(--input-bg, transparent);
   color: var(--input-text, inherit);
-  transition: border-color 0.15s ease, box-shadow 0.15s ease,
-    background 0.15s ease, opacity 0.15s ease, transform 0.15s ease;
+  transition:
+    border-color 0.15s ease,
+    box-shadow 0.15s ease,
+    background 0.15s ease,
+    opacity 0.15s ease,
+    transform 0.15s ease;
 
   &--disabled {
     cursor: not-allowed;
@@ -274,25 +281,25 @@ defineExpose({ fieldId, isFocused })
   }
 
   /* ===== dimensioni ===== */
-  &--sm {
+  &--sm:not(.vx-input--multiline) {
     height: 32px;
     padding: 0 10px;
     font-size: 13px;
   }
 
-  &--md {
+  &--md:not(.vx-input--multiline) {
     height: 40px;
     padding: 0 14px;
     font-size: 14px;
   }
 
-  &--lg {
+  &--lg:not(.vx-input--multiline) {
     height: 48px;
     padding: 0 18px;
     font-size: 15px;
   }
 
-  &--custom {
+  &--custom:not(.vx-input--multiline) {
     height: var(--vx-input-height, auto);
     min-height: var(--vx-input-min-height, 40px);
     padding: var(--vx-input-padding-y, 0) var(--vx-input-padding-x, 14px);
@@ -301,10 +308,10 @@ defineExpose({ fieldId, isFocused })
 
   &--multiline {
     height: auto;
-    min-height: 80px;
-    align-items: flex-start;
-    padding-top: 10px;
-    padding-bottom: 10px;
+    min-height: var(--vx-input-multiline-min-height, 96px);
+    align-items: stretch;
+    padding: 10px 14px;
+    font-size: var(--vx-input-font-size, 14px);
   }
 
   &--pill {
@@ -326,6 +333,11 @@ defineExpose({ fieldId, isFocused })
     background: transparent;
   }
 
+  &--text.vx-input--multiline {
+    padding-top: 10px;
+    padding-bottom: 10px;
+  }
+
   &--error {
     --input-border-focus: #{$negative};
     border-color: #{$negative};
@@ -341,7 +353,9 @@ defineExpose({ fieldId, isFocused })
   }
 
   &--focus-glow.vx-input--focused:not(.vx-input--disabled) {
-    box-shadow: 0 0 0 3px var(--input-shadow-focus, color-mix(in srgb, currentColor 25%, transparent)), 0 8px 20px var(--input-shadow-focus, color-mix(in srgb, currentColor 12%, transparent));
+    box-shadow:
+      0 0 0 3px var(--input-shadow-focus, color-mix(in srgb, currentColor 25%, transparent)),
+      0 8px 20px var(--input-shadow-focus, color-mix(in srgb, currentColor 12%, transparent));
     transform: translateY(-1px);
   }
 
@@ -363,19 +377,22 @@ defineExpose({ fieldId, isFocused })
   }
 }
 
-.vx-input__icon {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
-  opacity: 0.7;
-}
-
+.vx-input__icon,
 .vx-input__spinner {
   display: inline-flex;
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
+}
+
+.vx-input__icon {
+  opacity: 0.7;
+}
+
+.vx-input--multiline .vx-input__icon,
+.vx-input--multiline .vx-input__spinner {
+  align-self: flex-start;
+  margin-top: 2px;
 }
 
 .vx-input__hint {
