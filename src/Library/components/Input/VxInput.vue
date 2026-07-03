@@ -293,7 +293,7 @@ const props = defineProps({
   },
   /**
    * Override colori custom, scavalca il colore impostato tramite `color`.
-   * { background, text, border, focusBorder, focusShadow, placeholder }
+   * { background, text, icon, border, focusBorder, focusShadow, placeholder }
    */
   colors: {
     type: Object,

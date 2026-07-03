@@ -466,11 +466,13 @@
           :colors="{
             background: '#faf5ff',
             text: '#3b0764',
+            icon: '#16a34a',
             border: '#d8b4fe',
             focusBorder: '#7c3aed',
             focusShadow: 'rgba(124, 58, 237, 0.22)',
             placeholder: '#a78bfa'
           }"
+          :icon="Search"
           placeholder="Full custom colors"
           block
         />

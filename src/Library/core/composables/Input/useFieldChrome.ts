@@ -43,6 +43,7 @@ export function useFieldChrome(props, prefix = 'vx-field') {
   const colorMap = {
     background: '--input-bg',
     text: '--input-text',
+    icon: '--input-icon',
     border: '--input-border',
     focusBorder: '--input-border-focus',
     focusShadow: '--input-shadow-focus',

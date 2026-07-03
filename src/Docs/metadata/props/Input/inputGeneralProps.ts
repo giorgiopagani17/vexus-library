@@ -128,7 +128,7 @@ export const propsRows = [
   },
   {
     name: 'colors',
-    type: '{ background?, text?, border?, focusBorder?, focusShadow?, placeholder? }',
+    type: '{ background?, text?, icon?, border?, focusBorder?, focusShadow?, placeholder? }',
     default: 'null',
     desc: "Override completo dei colori. Ogni chiave accetta qualsiasi colore CSS valido ('#fff', 'rgba(...)', 'red', 'var(--mio-colore)')"
   },

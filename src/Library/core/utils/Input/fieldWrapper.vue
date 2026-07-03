@@ -120,7 +120,7 @@ const props = defineProps({
   },
   /**
    * Override colori custom, scavalca il colore impostato tramite `color`.
-   * { background, text, border, focusBorder, focusShadow, placeholder }
+   * { background, text, icon, border, focusBorder, focusShadow, placeholder }
    */
   colors: {
     type: Object,
@@ -344,7 +344,7 @@ defineExpose({ fieldId, isFocused })
   }
 
   /* ===== stato focus (bordo sempre, effetto extra secondo focusEffect) ===== */
-  &--focused:not(.vx-input--disabled) {
+  &--focused:not(.vx-input--disabled):not(.vx-input--error) {
     border-color: var(--input-border-focus, currentColor);
   }
 
@@ -383,6 +383,7 @@ defineExpose({ fieldId, isFocused })
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
+  color: var(--input-icon, --input-placeholder, rgba(0, 0, 0, 0.5));
 }
 
 .vx-input__icon {
