@@ -27,7 +27,7 @@
       <h2>Uso base</h2>
       <p>
         In qualsiasi componente, senza altro setup, importi <code>useVxApi</code>
-        e chiami <code>request(endpoint, options)</code>.
+        e chiami <code>VxRequest(endpoint, options)</code>.
       </p>
 
       <div class="example-row">
@@ -135,7 +135,7 @@
 
     <!-- Options table -->
     <section class="docs-section">
-      <h2>Opzioni di request()</h2>
+      <h2>Opzioni di VxRequest()</h2>
       <DesignPropsTable
         :columns="optionsColumns"
         :rows="optionsRows"
