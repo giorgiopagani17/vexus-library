@@ -585,7 +585,6 @@ import {
 const { VxNotify } = useVxNotify()
 
 const variantExamples = reactive({
-  solid: '',
   ghost: '',
   text: '',
 })
@@ -837,9 +836,8 @@ const onInput = () => {
 
 .docs-focus-custom {
   :deep(.vx-input--focus-custom.vx-input--focused) {
-    border-color: $secondary;
-    box-shadow: 0 0 0 3px rgba($secondary, 0.18), 0 8px 20px rgba($secondary, 0.12);
-    transform: translateY(-1px);
+    scale: 1.02;
+    transition: all 0.2s ease-in-out;
   }
 }
 </style>

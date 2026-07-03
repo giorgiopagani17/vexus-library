@@ -199,10 +199,10 @@ const props = defineProps({
     default: 'text',
     validator: (value) => INPUT_TYPES.includes(value),
   },
-  /** 'solid' | 'outline' | 'ghost' | 'text' (text = stile underline) */
+  /** 'outline' | 'ghost' | 'text' (text = stile underline) */
   variant: {
     type: String,
-    default: 'solid',
+    default: 'outline',
   },
   /**
    * Colore del bordo/focus ring (e, per type="file", del bottone "Scegli file").

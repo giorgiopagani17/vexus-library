@@ -340,7 +340,6 @@ defineExpose({ fieldId, isFocused })
     transform: translateY(-1px);
   }
 
-  &--focus-glow:not(.vx-input--disabled):hover,
   &--focus-glow.vx-input--focused:not(.vx-input--disabled) {
     box-shadow: 0 0 0 3px var(--input-shadow-focus, color-mix(in srgb, currentColor 25%, transparent)), 0 8px 20px var(--input-shadow-focus, color-mix(in srgb, currentColor 12%, transparent));
     transform: translateY(-1px);
