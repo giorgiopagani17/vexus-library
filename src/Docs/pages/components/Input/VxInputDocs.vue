@@ -41,9 +41,8 @@
         <code>&lt;input&gt;</code> pensati per un campo di testo:
         <code>text</code>, <code>password</code>, <code>email</code>,
         <code>number</code>, <code>tel</code>, <code>url</code>,
-        <code>search</code>, oltre a <code>file</code>, <code>checkbox</code>,
-        <code>radio</code>, <code>hidden</code>, <code>button</code>,
-        <code>submit</code>, <code>reset</code> e <code>image</code>. Viene
+        oltre a <code>file</code>, <code>checkbox</code>,
+        <code>radio</code>. Viene
         ignorata se <code>tag="textarea"</code>.
       </p>
 
@@ -60,9 +59,7 @@
       </div>
 
       <p class="section-note">
-        <code>checkbox</code>, <code>radio</code>, <code>hidden</code>,
-        <code>button</code>, <code>submit</code>, <code>reset</code> e
-        <code>image</code> sono supportati allo stesso modo tramite
+        <code>checkbox</code>, <code>radio</code> sono supportati allo stesso modo tramite
         <code>type</code>, ma non sono pensati per lo stile "campo di testo"
         di questo componente: per quei casi valuta un componente dedicato
         (es. <code>VxCheckbox</code>, <code>VxRadio</code>).

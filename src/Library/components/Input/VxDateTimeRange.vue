@@ -54,335 +54,342 @@
       </template>
     </VxFieldWrapper>
 
-    <Transition name="vx-dtrange-fade">
-      <div
-        v-if="isOpen"
-        ref="panelRef"
-        class="vx-dtrange__panel"
-        role="dialog"
-        aria-label="Date and time range picker dialog"
-        :style="panelStyle"
-      >
-        <div class="vx-dtrange__summary">
-          <div class="vx-dtrange__summary-label">
-            {{ summaryLabel }}
-          </div>
-
-          <div class="vx-dtrange__summary-grid">
-            <div class="vx-dtrange__summary-card">
-              <div class="vx-dtrange__summary-card-label">{{ startLabel }}</div>
-              <div class="vx-dtrange__summary-card-main">
-                {{ pendingStart ? dateFormat.formatDateWithTemplate(pendingStart) : emptyStartLabel }}
-              </div>
-              <div v-if="pendingStart" class="vx-dtrange__summary-card-sub">
-                {{ timeFormat.formatTimeWithTemplate(pendingStartHour, pendingStartMinute) }}
-              </div>
-            </div>
-
-            <div class="vx-dtrange__summary-sep" aria-hidden="true">→</div>
-
-            <div class="vx-dtrange__summary-card">
-              <div class="vx-dtrange__summary-card-label">{{ endLabel }}</div>
-              <div class="vx-dtrange__summary-card-main">
-                {{ pendingEnd ? dateFormat.formatDateWithTemplate(pendingEnd) : emptyEndLabel }}
-              </div>
-              <div v-if="pendingEnd" class="vx-dtrange__summary-card-sub">
-                {{ timeFormat.formatTimeWithTemplate(pendingEndHour, pendingEndMinute) }}
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <div class="vx-dtrange__tabs" role="tablist" aria-label="Date and time range sections">
-          <button
-            id="vx-dtrange-tab-date"
-            type="button"
-            role="tab"
-            class="vx-dtrange__tab"
-            :class="{ 'vx-dtrange__tab--active': activeTab === 'date' }"
-            :aria-selected="activeTab === 'date'"
-            aria-controls="vx-dtrange-panel-date"
-            @click="activeTab = 'date'"
-          >
-            {{ dateTabLabel }}
-          </button>
-
-          <button
-            id="vx-dtrange-tab-time"
-            type="button"
-            role="tab"
-            class="vx-dtrange__tab"
-            :class="{ 'vx-dtrange__tab--active': activeTab === 'time' }"
-            :aria-selected="activeTab === 'time'"
-            aria-controls="vx-dtrange-panel-time"
-            @click="activeTab = 'time'"
-          >
-            {{ timeTabLabel }}
-          </button>
-        </div>
-
+    <!--
+      Stesso schema di VxDatePicker/VxDateTimePicker/VxDateRangePicker.
+    -->
+    <AnchoredOverlay
+      v-model="isOpen"
+      :reference="rootRef"
+      aria-label="Date and time range picker dialog"
+      :gap="6"
+      :viewport-padding="8"
+      modal-on-mobile
+      lock-scroll-on-mobile
+    >
+      <template #default="{ isMobile }">
         <div
-          v-show="activeTab === 'date'"
-          id="vx-dtrange-panel-date"
-          role="tabpanel"
-          aria-labelledby="vx-dtrange-tab-date"
-          class="vx-dtrange__tabpanel"
+          class="vx-dtrange__panel"
+          :class="{ 'vx-dtrange__panel--mobile-modal': isMobile }"
         >
-          <div class="vx-dtrange__nav">
+          <div class="vx-dtrange__summary">
+            <div class="vx-dtrange__summary-label">
+              {{ summaryLabel }}
+            </div>
+
+            <div class="vx-dtrange__summary-grid">
+              <div class="vx-dtrange__summary-card">
+                <div class="vx-dtrange__summary-card-label">{{ startLabel }}</div>
+                <div class="vx-dtrange__summary-card-main">
+                  {{ pendingStart ? dateFormat.formatDateWithTemplate(pendingStart) : emptyStartLabel }}
+                </div>
+                <div v-if="pendingStart" class="vx-dtrange__summary-card-sub">
+                  {{ timeFormat.formatTimeWithTemplate(pendingStartHour, pendingStartMinute) }}
+                </div>
+              </div>
+
+              <div class="vx-dtrange__summary-sep" aria-hidden="true">→</div>
+
+              <div class="vx-dtrange__summary-card">
+                <div class="vx-dtrange__summary-card-label">{{ endLabel }}</div>
+                <div class="vx-dtrange__summary-card-main">
+                  {{ pendingEnd ? dateFormat.formatDateWithTemplate(pendingEnd) : emptyEndLabel }}
+                </div>
+                <div v-if="pendingEnd" class="vx-dtrange__summary-card-sub">
+                  {{ timeFormat.formatTimeWithTemplate(pendingEndHour, pendingEndMinute) }}
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="vx-dtrange__tabs" role="tablist" aria-label="Date and time range sections">
             <button
+              id="vx-dtrange-tab-date"
               type="button"
-              class="vx-dtrange__nav-btn"
-              aria-label="Previous month"
-              @click="calendar.navPrev"
+              role="tab"
+              class="vx-dtrange__tab"
+              :class="{ 'vx-dtrange__tab--active': activeTab === 'date' }"
+              :aria-selected="activeTab === 'date'"
+              aria-controls="vx-dtrange-panel-date"
+              @click="activeTab = 'date'"
             >
-              <ChevronLeft :size="16" />
+              {{ dateTabLabel }}
             </button>
 
-            <button type="button" class="vx-dtrange__month" @click="calendar.onHeaderClick">
-              {{ calendar.headerLabel.value }}
-            </button>
-
             <button
+              id="vx-dtrange-tab-time"
               type="button"
-              class="vx-dtrange__nav-btn"
-              aria-label="Next month"
-              @click="calendar.navNext"
+              role="tab"
+              class="vx-dtrange__tab"
+              :class="{ 'vx-dtrange__tab--active': activeTab === 'time' }"
+              :aria-selected="activeTab === 'time'"
+              aria-controls="vx-dtrange-panel-time"
+              @click="activeTab = 'time'"
             >
-              <ChevronRight :size="16" />
+              {{ timeTabLabel }}
             </button>
           </div>
 
-          <template v-if="calendar.viewMode.value === 'days'">
-            <div class="vx-dtrange__weekdays">
-              <span v-for="(day, index) in calendar.weekDays.value" :key="`${day}-${index}`">
-                {{ day }}
-              </span>
-            </div>
-
-            <div class="vx-dtrange__grid" @mouseleave="hoverDate = null">
+          <div
+            v-show="activeTab === 'date'"
+            id="vx-dtrange-panel-date"
+            role="tabpanel"
+            aria-labelledby="vx-dtrange-tab-date"
+            class="vx-dtrange__tabpanel"
+          >
+            <div class="vx-dtrange__nav">
               <button
-                v-for="(date, index) in calendar.calendarDays.value"
-                :key="index"
                 type="button"
-                class="vx-dtrange__day"
-                :class="dayClasses(date)"
-                :disabled="!date || isDayDisabled(date)"
-                @mouseenter="date && (hoverDate = date)"
-                @click="selectDay(date)"
+                class="vx-dtrange__nav-btn"
+                aria-label="Previous month"
+                @click="calendar.navPrev"
               >
-                {{ date ? date.getDate() : '' }}
+                <ChevronLeft :size="16" />
+              </button>
+
+              <button type="button" class="vx-dtrange__month" @click="calendar.onHeaderClick">
+                {{ calendar.headerLabel.value }}
+              </button>
+
+              <button
+                type="button"
+                class="vx-dtrange__nav-btn"
+                aria-label="Next month"
+                @click="calendar.navNext"
+              >
+                <ChevronRight :size="16" />
               </button>
             </div>
-          </template>
 
-          <div v-else-if="calendar.viewMode.value === 'months'" class="vx-dtrange__grid vx-dtrange__grid--months">
-            <button
-              v-for="(m, index) in calendar.monthsShort.value"
-              :key="m"
-              type="button"
-              class="vx-dtrange__cell"
-              @click="calendar.pickMonth(index)"
-            >
-              {{ m }}
-            </button>
+            <template v-if="calendar.viewMode.value === 'days'">
+              <div class="vx-dtrange__weekdays">
+                <span v-for="(day, index) in calendar.weekDays.value" :key="`${day}-${index}`">
+                  {{ day }}
+                </span>
+              </div>
+
+              <div class="vx-dtrange__grid" @mouseleave="hoverDate = null">
+                <button
+                  v-for="(date, index) in calendar.calendarDays.value"
+                  :key="index"
+                  type="button"
+                  class="vx-dtrange__day"
+                  :class="dayClasses(date)"
+                  :disabled="!date || isDayDisabled(date)"
+                  @mouseenter="date && (hoverDate = date)"
+                  @click="selectDay(date)"
+                >
+                  {{ date ? date.getDate() : '' }}
+                </button>
+              </div>
+            </template>
+
+            <div v-else-if="calendar.viewMode.value === 'months'" class="vx-dtrange__grid vx-dtrange__grid--months">
+              <button
+                v-for="(m, index) in calendar.monthsShort.value"
+                :key="m"
+                type="button"
+                class="vx-dtrange__cell"
+                @click="calendar.pickMonth(index)"
+              >
+                {{ m }}
+              </button>
+            </div>
+
+            <div v-else class="vx-dtrange__grid vx-dtrange__grid--years">
+              <button
+                v-for="y in calendar.yearsList.value"
+                :key="y"
+                type="button"
+                class="vx-dtrange__cell"
+                @click="calendar.pickYear(y)"
+              >
+                {{ y }}
+              </button>
+            </div>
           </div>
 
-          <div v-else class="vx-dtrange__grid vx-dtrange__grid--years">
-            <button
-              v-for="y in calendar.yearsList.value"
-              :key="y"
-              type="button"
-              class="vx-dtrange__cell"
-              @click="calendar.pickYear(y)"
-            >
-              {{ y }}
-            </button>
-          </div>
-        </div>
-
-        <div
-          v-show="activeTab === 'time'"
-          id="vx-dtrange-panel-time"
-          role="tabpanel"
-          aria-labelledby="vx-dtrange-tab-time"
-          class="vx-dtrange__tabpanel"
-        >
-          <div class="vx-dtrange__time-switch" role="tablist" aria-label="Start and end time panels">
-            <button
-              id="vx-dtrange-time-tab-start"
-              type="button"
-              role="tab"
-              class="vx-dtrange__time-switch-btn"
-              :class="{ 'vx-dtrange__time-switch-btn--active': activeTimeTab === 'start' }"
-              :aria-selected="activeTimeTab === 'start'"
-              aria-controls="vx-dtrange-time-panel-start"
-              @click="activeTimeTab = 'start'"
-            >
-              {{ startLabel }}
-            </button>
-
-            <button
-              id="vx-dtrange-time-tab-end"
-              type="button"
-              role="tab"
-              class="vx-dtrange__time-switch-btn"
-              :class="{ 'vx-dtrange__time-switch-btn--active': activeTimeTab === 'end' }"
-              :aria-selected="activeTimeTab === 'end'"
-              aria-controls="vx-dtrange-time-panel-end"
-              @click="activeTimeTab = 'end'"
-            >
-              {{ endLabel }}
-            </button>
-          </div>
-
-          <div class="vx-dtrange__time-panels">
-            <section
-              id="vx-dtrange-time-panel-start"
-              role="tabpanel"
-              aria-labelledby="vx-dtrange-time-tab-start"
-              class="vx-dtrange__time-panel vx-dtrange__time-panel--start"
-              :class="{
-                'vx-dtrange__time-panel--disabled': !pendingStart,
-                'vx-dtrange__time-panel--mobile-hidden': activeTimeTab !== 'start',
-              }"
-            >
-              <div class="vx-dtrange__time-panel-title">
-                <Clock :size="13" />
-                <span>{{ startLabel }}</span>
-              </div>
-
-              <div v-if="pendingStart" class="vx-dtrange__time-row">
-                <div class="vx-dtrange__time-col">
-                  <div class="vx-dtrange__time-subtitle">{{ startHourLabel }}</div>
-                  <div class="vx-dtrange__time-list">
-                    <button
-                      v-for="h in hours"
-                      :key="`sh-${h}`"
-                      type="button"
-                      class="vx-dtrange__time-cell"
-                      :class="{ 'vx-dtrange__time-cell--selected': h === pendingStartHour }"
-                      @click="pendingStartHour = h"
-                    >
-                      {{ pad(h) }}
-                    </button>
-                  </div>
-                </div>
-
-                <div class="vx-dtrange__time-col">
-                  <div class="vx-dtrange__time-subtitle">{{ startMinuteLabel }}</div>
-                  <div class="vx-dtrange__time-list">
-                    <button
-                      v-for="m in minutes"
-                      :key="`sm-${m}`"
-                      type="button"
-                      class="vx-dtrange__time-cell"
-                      :class="{ 'vx-dtrange__time-cell--selected': m === pendingStartMinute }"
-                      @click="pendingStartMinute = m"
-                    >
-                      {{ pad(m) }}
-                    </button>
-                  </div>
-                </div>
-              </div>
-
-              <div v-else class="vx-dtrange__time-empty">
-                {{ selectStartFirstLabel }}
-              </div>
-            </section>
-
-            <section
-              id="vx-dtrange-time-panel-end"
-              role="tabpanel"
-              aria-labelledby="vx-dtrange-time-tab-end"
-              class="vx-dtrange__time-panel vx-dtrange__time-panel--end"
-              :class="{
-                'vx-dtrange__time-panel--disabled': !pendingEnd,
-                'vx-dtrange__time-panel--mobile-hidden': activeTimeTab !== 'end',
-              }"
-            >
-              <div class="vx-dtrange__time-panel-title">
-                <Clock :size="13" />
-                <span>{{ endLabel }}</span>
-              </div>
-
-              <div v-if="pendingEnd" class="vx-dtrange__time-row">
-                <div class="vx-dtrange__time-col">
-                  <div class="vx-dtrange__time-subtitle">{{ endHourLabel }}</div>
-                  <div class="vx-dtrange__time-list">
-                    <button
-                      v-for="h in hours"
-                      :key="`eh-${h}`"
-                      type="button"
-                      class="vx-dtrange__time-cell"
-                      :class="{ 'vx-dtrange__time-cell--selected': h === pendingEndHour }"
-                      @click="pendingEndHour = h"
-                    >
-                      {{ pad(h) }}
-                    </button>
-                  </div>
-                </div>
-
-                <div class="vx-dtrange__time-col">
-                  <div class="vx-dtrange__time-subtitle">{{ endMinuteLabel }}</div>
-                  <div class="vx-dtrange__time-list">
-                    <button
-                      v-for="m in minutes"
-                      :key="`em-${m}`"
-                      type="button"
-                      class="vx-dtrange__time-cell"
-                      :class="{ 'vx-dtrange__time-cell--selected': m === pendingEndMinute }"
-                      @click="pendingEndMinute = m"
-                    >
-                      {{ pad(m) }}
-                    </button>
-                  </div>
-                </div>
-              </div>
-
-              <div v-else class="vx-dtrange__time-empty">
-                {{ selectEndFirstLabel }}
-              </div>
-            </section>
-          </div>
-        </div>
-
-        <div
-          class="vx-dtrange__footer"
-          :class="{ 'vx-dtrange__footer--two-buttons': clearable && (modelValue?.start || modelValue?.end) }"
-        >
-          <button
-            v-if="clearable && (modelValue?.start || modelValue?.end)"
-            type="button"
-            class="vx-dtrange__footer-btn vx-dtrange__footer-btn--ghost"
-            @click="onClear"
+          <div
+            v-show="activeTab === 'time'"
+            id="vx-dtrange-panel-time"
+            role="tabpanel"
+            aria-labelledby="vx-dtrange-tab-time"
+            class="vx-dtrange__tabpanel"
           >
-            {{ clearFooterLabel }}
-          </button>
+            <div class="vx-dtrange__time-switch" role="tablist" aria-label="Start and end time panels">
+              <button
+                id="vx-dtrange-time-tab-start"
+                type="button"
+                role="tab"
+                class="vx-dtrange__time-switch-btn"
+                :class="{ 'vx-dtrange__time-switch-btn--active': activeTimeTab === 'start' }"
+                :aria-selected="activeTimeTab === 'start'"
+                aria-controls="vx-dtrange-time-panel-start"
+                @click="activeTimeTab = 'start'"
+              >
+                {{ startLabel }}
+              </button>
 
-          <button
-            type="button"
-            class="vx-dtrange__footer-btn vx-dtrange__footer-btn--primary"
-            :disabled="!pendingStart || !pendingEnd"
-            @click="confirmSelection"
+              <button
+                id="vx-dtrange-time-tab-end"
+                type="button"
+                role="tab"
+                class="vx-dtrange__time-switch-btn"
+                :class="{ 'vx-dtrange__time-switch-btn--active': activeTimeTab === 'end' }"
+                :aria-selected="activeTimeTab === 'end'"
+                aria-controls="vx-dtrange-time-panel-end"
+                @click="activeTimeTab = 'end'"
+              >
+                {{ endLabel }}
+              </button>
+            </div>
+
+            <div class="vx-dtrange__time-panels">
+              <section
+                id="vx-dtrange-time-panel-start"
+                role="tabpanel"
+                aria-labelledby="vx-dtrange-time-tab-start"
+                class="vx-dtrange__time-panel vx-dtrange__time-panel--start"
+                :class="{
+                  'vx-dtrange__time-panel--disabled': !pendingStart,
+                  'vx-dtrange__time-panel--mobile-hidden': activeTimeTab !== 'start',
+                }"
+              >
+                <div class="vx-dtrange__time-panel-title">
+                  <Clock :size="13" />
+                  <span>{{ startLabel }}</span>
+                </div>
+
+                <div v-if="pendingStart" class="vx-dtrange__time-row">
+                  <div class="vx-dtrange__time-col">
+                    <div class="vx-dtrange__time-subtitle">{{ startHourLabel }}</div>
+                    <div class="vx-dtrange__time-list">
+                      <button
+                        v-for="h in hours"
+                        :key="`sh-${h}`"
+                        type="button"
+                        class="vx-dtrange__time-cell"
+                        :class="{ 'vx-dtrange__time-cell--selected': h === pendingStartHour }"
+                        @click="pendingStartHour = h"
+                      >
+                        {{ pad(h) }}
+                      </button>
+                    </div>
+                  </div>
+
+                  <div class="vx-dtrange__time-col">
+                    <div class="vx-dtrange__time-subtitle">{{ startMinuteLabel }}</div>
+                    <div class="vx-dtrange__time-list">
+                      <button
+                        v-for="m in minutes"
+                        :key="`sm-${m}`"
+                        type="button"
+                        class="vx-dtrange__time-cell"
+                        :class="{ 'vx-dtrange__time-cell--selected': m === pendingStartMinute }"
+                        @click="pendingStartMinute = m"
+                      >
+                        {{ pad(m) }}
+                      </button>
+                    </div>
+                  </div>
+                </div>
+
+                <div v-else class="vx-dtrange__time-empty">
+                  {{ selectStartFirstLabel }}
+                </div>
+              </section>
+
+              <section
+                id="vx-dtrange-time-panel-end"
+                role="tabpanel"
+                aria-labelledby="vx-dtrange-time-tab-end"
+                class="vx-dtrange__time-panel vx-dtrange__time-panel--end"
+                :class="{
+                  'vx-dtrange__time-panel--disabled': !pendingEnd,
+                  'vx-dtrange__time-panel--mobile-hidden': activeTimeTab !== 'end',
+                }"
+              >
+                <div class="vx-dtrange__time-panel-title">
+                  <Clock :size="13" />
+                  <span>{{ endLabel }}</span>
+                </div>
+
+                <div v-if="pendingEnd" class="vx-dtrange__time-row">
+                  <div class="vx-dtrange__time-col">
+                    <div class="vx-dtrange__time-subtitle">{{ endHourLabel }}</div>
+                    <div class="vx-dtrange__time-list">
+                      <button
+                        v-for="h in hours"
+                        :key="`eh-${h}`"
+                        type="button"
+                        class="vx-dtrange__time-cell"
+                        :class="{ 'vx-dtrange__time-cell--selected': h === pendingEndHour }"
+                        @click="pendingEndHour = h"
+                      >
+                        {{ pad(h) }}
+                      </button>
+                    </div>
+                  </div>
+
+                  <div class="vx-dtrange__time-col">
+                    <div class="vx-dtrange__time-subtitle">{{ endMinuteLabel }}</div>
+                    <div class="vx-dtrange__time-list">
+                      <button
+                        v-for="m in minutes"
+                        :key="`em-${m}`"
+                        type="button"
+                        class="vx-dtrange__time-cell"
+                        :class="{ 'vx-dtrange__time-cell--selected': m === pendingEndMinute }"
+                        @click="pendingEndMinute = m"
+                      >
+                        {{ pad(m) }}
+                      </button>
+                    </div>
+                  </div>
+                </div>
+
+                <div v-else class="vx-dtrange__time-empty">
+                  {{ selectEndFirstLabel }}
+                </div>
+              </section>
+            </div>
+          </div>
+
+          <div
+            class="vx-dtrange__footer"
+            :class="{ 'vx-dtrange__footer--two-buttons': clearable && (modelValue?.start || modelValue?.end) }"
           >
-            {{ confirmLabel }}
-          </button>
+            <button
+              v-if="clearable && (modelValue?.start || modelValue?.end)"
+              type="button"
+              class="vx-dtrange__footer-btn vx-dtrange__footer-btn--ghost"
+              @click="onClear"
+            >
+              {{ clearFooterLabel }}
+            </button>
+
+            <button
+              type="button"
+              class="vx-dtrange__footer-btn vx-dtrange__footer-btn--primary"
+              :disabled="!pendingStart || !pendingEnd"
+              @click="confirmSelection"
+            >
+              {{ confirmLabel }}
+            </button>
+          </div>
         </div>
-      </div>
-    </Transition>
+      </template>
+    </AnchoredOverlay>
   </div>
 </template>
 
 <script setup>
 import { computed, ref, watch } from 'vue'
 import { CalendarRange, ChevronLeft, ChevronRight, Clock, X } from 'lucide-vue-next'
-import VxFieldWrapper from '@/Library/core/utils/Input/fieldWrapper.vue'
+import VxFieldWrapper from '@/Library/core/components/Input/FieldWrapper.vue'
 import { useDateFormat } from '@/Library/core/composables/Date/useDateFormat'
 import { useTimeFormat } from '@/Library/core/composables/Date/useTimeFormat'
 import { useCalendarGrid } from '@/Library/core/composables/Date/useCalendarGrid'
-import { useClickOutside } from '@/Library/core/composables/useClickOutside'
-import { useFloatingPanel } from '@/Library/core/composables/Input/useFloatingPanel'
-import { useCloseWhenReferenceHidden } from '@/Library/core/composables/Input/useCloseWhenReferenceHidden'
+import AnchoredOverlay from '@/Library/core/components/Picker/AnchoredOverlay.vue'
 
 const props = defineProps({
   modelValue: {
@@ -566,20 +573,10 @@ const props = defineProps({
 const emit = defineEmits(['update:modelValue', 'change', 'clear', 'focus', 'blur'])
 
 const rootRef = ref(null)
-const panelRef = ref(null)
 const isOpen = ref(false)
 const hoverDate = ref(null)
 const activeTab = ref('date')
 const activeTimeTab = ref('start')
-
-const { panelStyle } = useFloatingPanel(rootRef, panelRef, isOpen, {
-  gap: 6,
-  viewportPadding: 8,
-})
-
-useCloseWhenReferenceHidden(rootRef, isOpen, () => {
-  isOpen.value = false
-})
 
 const wrapperProps = computed(() => ({
   size: props.size,
@@ -746,9 +743,8 @@ function onFieldFocus(event, chromeFocus) {
   emit('focus', event)
 }
 
-useClickOutside(rootRef, () => {
-  isOpen.value = false
-})
+// Click outside, ESC, backdrop mobile e anchoring persistente sono ora
+// gestiti centralmente da AnchoredOverlay.
 
 function displayFieldValue(parsed) {
   if (!parsed) return ''
@@ -946,9 +942,12 @@ function onFieldBlur(event, chromeBlur) {
   }
 }
 
+/*
+ * Positioning demandato ad <AnchoredOverlay>. Nessun max-height/overflow
+ * sul pannello, e nessuno scroll interno nelle liste ore/minuti: tutte le
+ * voci sono sempre visibili, il pannello cresce quanto serve.
+ */
 .vx-dtrange__panel {
-  position: absolute;
-  z-index: 50;
   width: 560px;
   max-width: calc(100vw - 16px);
   padding: 12px;
@@ -957,7 +956,6 @@ function onFieldBlur(event, chromeBlur) {
   background: var(--vx-dtrange-panel-bg, #fff);
   color: var(--vx-dtrange-panel-text, #1e1e1e);
   box-shadow: 0 12px 28px rgba(0, 0, 0, 0.14);
-  overflow: hidden;
   box-sizing: border-box;
 }
 
@@ -1261,10 +1259,12 @@ function onFieldBlur(event, chromeBlur) {
 }
 
 .vx-dtrange__time-col {
+  flex: 1 1 0;
   min-width: 0;
   display: flex;
   flex-direction: column;
   gap: 6px;
+  overflow: hidden;
 }
 
 .vx-dtrange__time-subtitle {
@@ -1279,18 +1279,20 @@ function onFieldBlur(event, chromeBlur) {
   display: flex;
   flex-direction: column;
   gap: 2px;
-  max-height: 200px;
+
+  max-height: 220px;
   overflow-y: auto;
-  padding-right: 2px;
+  overflow-x: hidden;
+
   scrollbar-width: thin;
 
   &::-webkit-scrollbar {
-    width: 4px;
+    width: 6px;
   }
 
   &::-webkit-scrollbar-thumb {
-    background: rgba(0, 0, 0, 0.15);
-    border-radius: 4px;
+    border-radius: 999px;
+    background: rgba(0, 0, 0, 0.2);
   }
 }
 
@@ -1381,17 +1383,6 @@ function onFieldBlur(event, chromeBlur) {
   }
 }
 
-.vx-dtrange-fade-enter-active,
-.vx-dtrange-fade-leave-active {
-  transition: opacity 0.12s ease, transform 0.12s ease;
-}
-
-.vx-dtrange-fade-enter-from,
-.vx-dtrange-fade-leave-to {
-  opacity: 0;
-  transform: translateY(-4px);
-}
-
 @media (max-width: 720px) {
   .vx-dtrange__panel {
     width: calc(100vw - 16px);
@@ -1423,6 +1414,21 @@ function onFieldBlur(event, chromeBlur) {
   .vx-dtrange__footer,
   .vx-dtrange__footer--two-buttons {
     grid-template-columns: 1fr;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .vx-dtrange__icon-btn,
+  .vx-dtrange__clear,
+  .vx-dtrange__tab,
+  .vx-dtrange__time-switch-btn,
+  .vx-dtrange__nav-btn,
+  .vx-dtrange__month,
+  .vx-dtrange__day,
+  .vx-dtrange__cell,
+  .vx-dtrange__time-cell,
+  .vx-dtrange__footer-btn {
+    transition-duration: 0.01ms !important;
   }
 }
 </style>

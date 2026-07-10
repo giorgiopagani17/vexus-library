@@ -27,7 +27,7 @@
 
 <script setup>
 import { computed, ref } from 'vue'
-import VxFieldWrapper from '@/Library/core/components/Input/fieldWrapper.vue'
+import VxFieldWrapper from '@/Library/core/components/Input/FieldWrapper.vue'
 
 const props = defineProps({
   /** Valore corrente (v-model), number o string numerica */

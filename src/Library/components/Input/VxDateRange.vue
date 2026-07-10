@@ -33,7 +33,7 @@
           :disabled="fieldDisabled || loading"
           :placeholder="placeholder"
           autocomplete="off"
-          @focus="() => { openPicker(); chromeFocus?.() }"
+          @focus="onFieldFocus($event, chromeFocus)"
           @input="onInput"
           @keydown.enter="onEnter"
           @blur="onFieldBlur($event, chromeBlur)"
@@ -54,114 +54,122 @@
       </template>
     </VxFieldWrapper>
 
-    <Transition name="vx-daterange-fade">
-      <div
-        v-if="isOpen"
-        ref="panelRef"
-        class="vx-daterange__panel"
-        role="dialog"
-        aria-label="Date range picker dialog"
-        :style="panelStyle"
-      >
-        <div class="vx-daterange__nav">
-          <button
-            type="button"
-            class="vx-daterange__nav-btn"
-            aria-label="Previous month"
-            @click="calendar.navPrev"
-          >
-            <ChevronLeft :size="16" />
-          </button>
-
-          <button type="button" class="vx-daterange__month" @click="calendar.onHeaderClick">
-            {{ calendar.headerLabel.value }}
-          </button>
-
-          <button
-            type="button"
-            class="vx-daterange__nav-btn"
-            aria-label="Next month"
-            @click="calendar.navNext"
-          >
-            <ChevronRight :size="16" />
-          </button>
-        </div>
-
-        <template v-if="calendar.viewMode.value === 'days'">
-          <div class="vx-daterange__weekdays">
-            <span v-for="(day, index) in calendar.weekDays.value" :key="`${day}-${index}`">
-              {{ day }}
-            </span>
-          </div>
-
-          <div class="vx-daterange__grid" @mouseleave="hoverDate = null">
+    <!--
+      Stesso schema di VxDatePicker/VxDateTimePicker: apertura, anchoring,
+      positioning e responsive sono delegati ad AnchoredOverlay.
+    -->
+    <AnchoredOverlay
+      v-model="isOpen"
+      :reference="rootRef"
+      aria-label="Date range picker dialog"
+      :gap="6"
+      :viewport-padding="8"
+      modal-on-mobile
+      lock-scroll-on-mobile
+    >
+      <template #default="{ isMobile }">
+        <div
+          class="vx-daterange__panel"
+          :class="{ 'vx-daterange__panel--mobile-modal': isMobile }"
+        >
+          <div class="vx-daterange__nav">
             <button
-              v-for="(date, index) in calendar.calendarDays.value"
-              :key="index"
               type="button"
-              class="vx-daterange__day"
-              :class="dayClasses(date)"
-              :disabled="!date || isDayDisabled(date)"
-              @mouseenter="date && (hoverDate = date)"
-              @click="selectDay(date)"
+              class="vx-daterange__nav-btn"
+              aria-label="Previous month"
+              @click="calendar.navPrev"
             >
-              {{ date ? date.getDate() : '' }}
+              <ChevronLeft :size="16" />
+            </button>
+
+            <button type="button" class="vx-daterange__month" @click="calendar.onHeaderClick">
+              {{ calendar.headerLabel.value }}
+            </button>
+
+            <button
+              type="button"
+              class="vx-daterange__nav-btn"
+              aria-label="Next month"
+              @click="calendar.navNext"
+            >
+              <ChevronRight :size="16" />
             </button>
           </div>
-        </template>
 
-        <div
-          v-else-if="calendar.viewMode.value === 'months'"
-          class="vx-daterange__grid vx-daterange__grid--months"
-        >
-          <button
-            v-for="(m, index) in calendar.monthsShort.value"
-            :key="m"
-            type="button"
-            class="vx-daterange__cell"
-            :class="{ 'vx-daterange__cell--today': calendar.isCurrentMonth(index) }"
-            @click="calendar.pickMonth(index)"
-          >
-            {{ m }}
-          </button>
-        </div>
+          <template v-if="calendar.viewMode.value === 'days'">
+            <div class="vx-daterange__weekdays">
+              <span v-for="(day, index) in calendar.weekDays.value" :key="`${day}-${index}`">
+                {{ day }}
+              </span>
+            </div>
 
-        <div v-else class="vx-daterange__grid vx-daterange__grid--years">
-          <button
-            v-for="y in calendar.yearsList.value"
-            :key="y"
-            type="button"
-            class="vx-daterange__cell"
-            :class="{ 'vx-daterange__cell--today': calendar.isCurrentYear(y) }"
-            @click="calendar.pickYear(y)"
-          >
-            {{ y }}
-          </button>
-        </div>
+            <div class="vx-daterange__grid" @mouseleave="hoverDate = null">
+              <button
+                v-for="(date, index) in calendar.calendarDays.value"
+                :key="index"
+                type="button"
+                class="vx-daterange__day"
+                :class="dayClasses(date)"
+                :disabled="!date || isDayDisabled(date)"
+                @mouseenter="date && (hoverDate = date)"
+                @click="selectDay(date)"
+              >
+                {{ date ? date.getDate() : '' }}
+              </button>
+            </div>
+          </template>
 
-        <div v-if="clearable && (modelValue?.start || modelValue?.end)" class="vx-daterange__footer">
-          <button
-            type="button"
-            class="vx-daterange__footer-btn vx-daterange__footer-btn--ghost"
-            @click="onClear"
+          <div
+            v-else-if="calendar.viewMode.value === 'months'"
+            class="vx-daterange__grid vx-daterange__grid--months"
           >
-            {{ clearFooterLabel }}
-          </button>
+            <button
+              v-for="(m, index) in calendar.monthsShort.value"
+              :key="m"
+              type="button"
+              class="vx-daterange__cell"
+              :class="{ 'vx-daterange__cell--today': calendar.isCurrentMonth(index) }"
+              @click="calendar.pickMonth(index)"
+            >
+              {{ m }}
+            </button>
+          </div>
+
+          <div v-else class="vx-daterange__grid vx-daterange__grid--years">
+            <button
+              v-for="y in calendar.yearsList.value"
+              :key="y"
+              type="button"
+              class="vx-daterange__cell"
+              :class="{ 'vx-daterange__cell--today': calendar.isCurrentYear(y) }"
+              @click="calendar.pickYear(y)"
+            >
+              {{ y }}
+            </button>
+          </div>
+
+          <div v-if="clearable && (modelValue?.start || modelValue?.end)" class="vx-daterange__footer">
+            <button
+              type="button"
+              class="vx-daterange__footer-btn vx-daterange__footer-btn--ghost"
+              @click="onClear"
+            >
+              {{ clearFooterLabel }}
+            </button>
+          </div>
         </div>
-      </div>
-    </Transition>
+      </template>
+    </AnchoredOverlay>
   </div>
 </template>
 
 <script setup>
 import { computed, ref, watch } from 'vue'
 import { CalendarRange, ChevronLeft, ChevronRight, X } from 'lucide-vue-next'
-import VxFieldWrapper from '@/Library/core/components/Input/fieldWrapper.vue'
+import VxFieldWrapper from '@/Library/core/components/Input/FieldWrapper.vue'
 import { useDateFormat } from '@/Library/core/composables/Date/useDateFormat'
 import { useCalendarGrid } from '@/Library/core/composables/Date/useCalendarGrid'
-import { useClickOutside } from '@/Library/core/composables/useClickOutside'
-import { useFloatingPanel } from '@/Library/core/composables/Input/useFloatingPanel'
-import { useCloseWhenReferenceHidden } from '@/Library/core/composables/Input/useCloseWhenReferenceHidden'
+import AnchoredOverlay from '@/Library/core/components/Picker/AnchoredOverlay.vue'
 
 const props = defineProps({
   modelValue: {
@@ -274,21 +282,11 @@ const props = defineProps({
   },
 })
 
-const emit = defineEmits(['update:modelValue', 'change', 'clear'])
+const emit = defineEmits(['update:modelValue', 'change', 'clear', 'focus', 'blur'])
 
 const rootRef = ref(null)
-const panelRef = ref(null)
 const isOpen = ref(false)
 const hoverDate = ref(null)
-
-const { panelStyle } = useFloatingPanel(rootRef, panelRef, isOpen, {
-  gap: 6,
-  viewportPadding: 8,
-})
-
-useCloseWhenReferenceHidden(rootRef, isOpen, () => {
-  isOpen.value = false
-})
 
 const wrapperProps = computed(() => ({
   size: props.size,
@@ -400,21 +398,21 @@ function onClear(event) {
   emit('clear')
 }
 
-function openFor(field) {
-  if (props.disabled || props.loading) return
-  isOpen.value = true
-  calendar.resetToDate((field === 'end' ? endDate.value : startDate.value) ?? new Date())
-}
-
 function openPicker() {
   if (props.disabled || props.loading) return
   isOpen.value = true
   calendar.resetToDate(startDate.value ?? endDate.value ?? new Date())
 }
 
-useClickOutside(rootRef, () => {
-  isOpen.value = false
-})
+function onFieldFocus(event, chromeFocus) {
+  openPicker()
+  chromeFocus?.(event)
+  emit('focus', event)
+}
+
+// Click outside, ESC, backdrop mobile e anchoring persistente sono ora
+// gestiti centralmente da AnchoredOverlay: non serve più useClickOutside
+// né useCloseWhenReferenceHidden qui.
 
 const displayValue = computed(() => {
   const start = dateFormat.formatDateWithTemplate(startDate.value)
@@ -514,6 +512,7 @@ function onEnter(event) {
 function onFieldBlur(event, chromeBlur) {
   commitInput()
   chromeBlur?.(event)
+  emit('blur', event)
 }
 </script>
 
@@ -585,16 +584,21 @@ function onFieldBlur(event, chromeBlur) {
   }
 }
 
+/*
+ * Positioning demandato ad <AnchoredOverlay>. Nessun overflow/max-height:
+ * il pannello si dimensiona sul contenuto (griglia calendario), niente
+ * scroll interno.
+ */
 .vx-daterange__panel {
-  position: absolute;
-  z-index: 50;
   width: 260px;
+  max-width: calc(100vw - 16px);
   padding: 12px;
   border-radius: 12px;
   border: 1px solid rgba(0, 0, 0, 0.1);
   background: var(--vx-daterange-panel-bg, #fff);
   color: var(--vx-daterange-panel-text, #1e1e1e);
   box-shadow: 0 12px 28px rgba(0, 0, 0, 0.14);
+  box-sizing: border-box;
 }
 
 .vx-daterange__nav {
@@ -765,14 +769,22 @@ function onFieldBlur(event, chromeBlur) {
   }
 }
 
-.vx-daterange-fade-enter-active,
-.vx-daterange-fade-leave-active {
-  transition: opacity 0.12s ease, transform 0.12s ease;
+@media (max-width: 640px) {
+  .vx-daterange__panel {
+    width: calc(100vw - 16px);
+    max-width: calc(100vw - 16px);
+  }
 }
 
-.vx-daterange-fade-enter-from,
-.vx-daterange-fade-leave-to {
-  opacity: 0;
-  transform: translateY(-4px);
+@media (prefers-reduced-motion: reduce) {
+  .vx-daterange__icon-btn,
+  .vx-daterange__clear,
+  .vx-daterange__nav-btn,
+  .vx-daterange__month,
+  .vx-daterange__day,
+  .vx-daterange__cell,
+  .vx-daterange__footer-btn {
+    transition-duration: 0.01ms !important;
+  }
 }
 </style>

@@ -158,18 +158,13 @@ export const INPUT_TYPES = [
   'file',
   'checkbox',
   'radio',
-  'hidden',
-  'button',
-  'submit',
-  'reset',
-  'image',
 ]
 </script>
 
 <script setup>
 import { computed, ref, watch } from 'vue'
 import { ChevronDown, ChevronUp, Eye, EyeOff, Upload, X } from 'lucide-vue-next'
-import VxFieldWrapper from '@/Library/core/components/Input/fieldWrapper.vue'
+import VxFieldWrapper from '@/Library/core/components/Input/FieldWrapper.vue'
 
 // Pattern di validazione automatica per email/tel/url. Volutamente
 // permissivi (soprattutto tel, che varia molto tra paesi): l'obiettivo è

@@ -44,7 +44,7 @@
 <script setup>
 import { computed, ref } from 'vue'
 import { X } from 'lucide-vue-next'
-import VxFieldWrapper from '@/Library/core/components/Input/fieldWrapper.vue'
+import VxFieldWrapper from '@/Library/core/components/Input/FieldWrapper.vue'
 
 const props = defineProps({
   /** Colore selezionato, formato hex '#rrggbb' (v-model) */

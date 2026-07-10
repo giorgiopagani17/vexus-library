@@ -58,232 +58,243 @@
       </template>
     </VxFieldWrapper>
 
-    <Transition :name="transitionName" appear>
-      <div
-        v-if="isOpen"
-        ref="panelRef"
-        class="vx-datetimepicker__panel"
-        :class="{ 'vx-datetimepicker__panel--mobile-modal': isMobile }"
-        role="dialog"
-        aria-label="Date and time picker dialog"
-        :style="panelStyle"
-      >
-        <div class="vx-datetimepicker__summary">
-          <div class="vx-datetimepicker__summary-label">
-            {{ summaryLabel }}
-          </div>
-
-          <div class="vx-datetimepicker__summary-main">
-            {{ pendingDate ? dateFormat.formatDateWithTemplate(pendingDate) : placeholder }}
-          </div>
-
-          <div v-if="pendingDate" class="vx-datetimepicker__summary-sub">
-            {{ timeFormat.formatTimeWithTemplate(pendingHour, pendingMinute) }}
-          </div>
-        </div>
-
-        <div class="vx-datetimepicker__tabs" role="tablist" aria-label="Date and time sections">
-          <button
-            id="vx-datetimepicker-tab-date"
-            type="button"
-            role="tab"
-            class="vx-datetimepicker__tab"
-            :class="{ 'vx-datetimepicker__tab--active': activeTab === 'date' }"
-            :aria-selected="activeTab === 'date'"
-            aria-controls="vx-datetimepicker-panel-date"
-            @click="activeTab = 'date'"
-          >
-            {{ dateTabLabel }}
-          </button>
-
-          <button
-            id="vx-datetimepicker-tab-time"
-            type="button"
-            role="tab"
-            class="vx-datetimepicker__tab"
-            :class="{ 'vx-datetimepicker__tab--active': activeTab === 'time' }"
-            :aria-selected="activeTab === 'time'"
-            aria-controls="vx-datetimepicker-panel-time"
-            @click="activeTab = 'time'"
-          >
-            {{ timeTabLabel }}
-          </button>
-        </div>
-
+    <!--
+      Tutta la logica di apertura/anchoring/positioning/responsive è ora
+      delegata ad AnchoredOverlay: qui restano solo il markup e lo stato
+      "di dominio" del datetime picker (tab attiva, giorno/ora pendenti...).
+      Lo stesso AnchoredOverlay puo' essere riusato tal quale da DatePicker,
+      TimePicker, Select, Autocomplete, ecc.
+    -->
+    <AnchoredOverlay
+      v-model="isOpen"
+      :reference="rootRef"
+      aria-label="Date and time picker dialog"
+      :gap="8"
+      :viewport-padding="8"
+      modal-on-mobile
+      lock-scroll-on-mobile
+    >
+      <template #default="{ isMobile }">
         <div
-          v-show="activeTab === 'date'"
-          id="vx-datetimepicker-panel-date"
-          role="tabpanel"
-          aria-labelledby="vx-datetimepicker-tab-date"
-          class="vx-datetimepicker__tabpanel"
+          class="vx-datetimepicker__panel"
+          :class="{ 'vx-datetimepicker__panel--mobile-modal': isMobile }"
         >
-          <div class="vx-datetimepicker__nav">
-            <button
-              type="button"
-              class="vx-datetimepicker__nav-btn"
-              aria-label="Previous month"
-              @click="calendar.navPrev"
-            >
-              <ChevronLeft :size="16" />
-            </button>
+          <div class="vx-datetimepicker__summary">
+            <div class="vx-datetimepicker__summary-label">
+              {{ summaryLabel }}
+            </div>
 
-            <button type="button" class="vx-datetimepicker__month" @click="calendar.onHeaderClick">
-              {{ calendar.headerLabel.value }}
-            </button>
+            <div class="vx-datetimepicker__summary-main">
+              {{ pendingDate ? dateFormat.formatDateWithTemplate(pendingDate) : placeholder }}
+            </div>
 
-            <button
-              type="button"
-              class="vx-datetimepicker__nav-btn"
-              aria-label="Next month"
-              @click="calendar.navNext"
-            >
-              <ChevronRight :size="16" />
-            </button>
+            <div v-if="pendingDate" class="vx-datetimepicker__summary-sub">
+              {{ timeFormat.formatTimeWithTemplate(pendingHour, pendingMinute) }}
+            </div>
           </div>
 
-          <template v-if="calendar.viewMode.value === 'days'">
-            <div class="vx-datetimepicker__weekdays">
-              <span v-for="(day, index) in calendar.weekDays.value" :key="`${day}-${index}`">
-                {{ day }}
-              </span>
-            </div>
+          <div class="vx-datetimepicker__tabs" role="tablist" aria-label="Date and time sections">
+            <button
+              id="vx-datetimepicker-tab-date"
+              type="button"
+              role="tab"
+              class="vx-datetimepicker__tab"
+              :class="{ 'vx-datetimepicker__tab--active': activeTab === 'date' }"
+              :aria-selected="activeTab === 'date'"
+              aria-controls="vx-datetimepicker-panel-date"
+              @click="activeTab = 'date'"
+            >
+              {{ dateTabLabel }}
+            </button>
 
-            <div class="vx-datetimepicker__grid">
-              <button
-                v-for="(date, index) in calendar.calendarDays.value"
-                :key="index"
-                type="button"
-                class="vx-datetimepicker__day"
-                :class="{
-                  'vx-datetimepicker__day--empty': !date,
-                  'vx-datetimepicker__day--today': date && calendar.isToday(date),
-                  'vx-datetimepicker__day--selected': date && isSelectedDay(date),
-                }"
-                :disabled="!date || isDayDisabled(date)"
-                @click="selectDay(date)"
-              >
-                {{ date ? date.getDate() : '' }}
-              </button>
-            </div>
-          </template>
+            <button
+              id="vx-datetimepicker-tab-time"
+              type="button"
+              role="tab"
+              class="vx-datetimepicker__tab"
+              :class="{ 'vx-datetimepicker__tab--active': activeTab === 'time' }"
+              :aria-selected="activeTab === 'time'"
+              aria-controls="vx-datetimepicker-panel-time"
+              @click="activeTab = 'time'"
+            >
+              {{ timeTabLabel }}
+            </button>
+          </div>
 
           <div
-            v-else-if="calendar.viewMode.value === 'months'"
-            class="vx-datetimepicker__grid vx-datetimepicker__grid--months"
+            v-show="activeTab === 'date'"
+            id="vx-datetimepicker-panel-date"
+            role="tabpanel"
+            aria-labelledby="vx-datetimepicker-tab-date"
+            class="vx-datetimepicker__tabpanel"
           >
-            <button
-              v-for="(m, index) in calendar.monthsShort.value"
-              :key="m"
-              type="button"
-              class="vx-datetimepicker__cell"
-              :class="{ 'vx-datetimepicker__cell--today': calendar.isCurrentMonth(index) }"
-              @click="calendar.pickMonth(index)"
-            >
-              {{ m }}
-            </button>
-          </div>
+            <div class="vx-datetimepicker__nav">
+              <button
+                type="button"
+                class="vx-datetimepicker__nav-btn"
+                aria-label="Previous month"
+                @click="calendar.navPrev"
+              >
+                <ChevronLeft :size="16" />
+              </button>
 
-          <div v-else class="vx-datetimepicker__grid vx-datetimepicker__grid--years">
-            <button
-              v-for="y in calendar.yearsList.value"
-              :key="y"
-              type="button"
-              class="vx-datetimepicker__cell"
-              :class="{ 'vx-datetimepicker__cell--today': calendar.isCurrentYear(y) }"
-              @click="calendar.pickYear(y)"
-            >
-              {{ y }}
-            </button>
-          </div>
-        </div>
+              <button type="button" class="vx-datetimepicker__month" @click="calendar.onHeaderClick">
+                {{ calendar.headerLabel.value }}
+              </button>
 
-        <div
-          v-show="activeTab === 'time'"
-          id="vx-datetimepicker-panel-time"
-          role="tabpanel"
-          aria-labelledby="vx-datetimepicker-tab-time"
-          class="vx-datetimepicker__tabpanel"
-        >
-          <div class="vx-datetimepicker__time-cols">
-            <div class="vx-datetimepicker__time-col">
-              <div class="vx-datetimepicker__time-label">
-                <Clock :size="13" />
-                <span>{{ hoursLabel }}</span>
-              </div>
-
-              <div class="vx-datetimepicker__time-list">
-                <button
-                  v-for="h in hours"
-                  :key="`h-${h}`"
-                  type="button"
-                  class="vx-datetimepicker__time-cell"
-                  :class="{ 'vx-datetimepicker__time-cell--selected': h === pendingHour }"
-                  @click="pickHour(h)"
-                >
-                  {{ pad(h) }}
-                </button>
-              </div>
+              <button
+                type="button"
+                class="vx-datetimepicker__nav-btn"
+                aria-label="Next month"
+                @click="calendar.navNext"
+              >
+                <ChevronRight :size="16" />
+              </button>
             </div>
 
-            <div class="vx-datetimepicker__time-col">
-              <div class="vx-datetimepicker__time-label">
-                <Clock :size="13" />
-                <span>{{ minutesLabel }}</span>
+            <template v-if="calendar.viewMode.value === 'days'">
+              <div class="vx-datetimepicker__weekdays">
+                <span v-for="(day, index) in calendar.weekDays.value" :key="`${day}-${index}`">
+                  {{ day }}
+                </span>
               </div>
 
-              <div class="vx-datetimepicker__time-list">
+              <div class="vx-datetimepicker__grid">
                 <button
-                  v-for="m in minutes"
-                  :key="`m-${m}`"
+                  v-for="(date, index) in calendar.calendarDays.value"
+                  :key="index"
                   type="button"
-                  class="vx-datetimepicker__time-cell"
-                  :class="{ 'vx-datetimepicker__time-cell--selected': m === pendingMinute }"
-                  @click="pickMinute(m)"
+                  class="vx-datetimepicker__day"
+                  :class="{
+                    'vx-datetimepicker__day--empty': !date,
+                    'vx-datetimepicker__day--today': date && calendar.isToday(date),
+                    'vx-datetimepicker__day--selected': date && isSelectedDay(date),
+                  }"
+                  :disabled="!date || isDayDisabled(date)"
+                  @click="selectDay(date)"
                 >
-                  {{ pad(m) }}
+                  {{ date ? date.getDate() : '' }}
                 </button>
+              </div>
+            </template>
+
+            <div
+              v-else-if="calendar.viewMode.value === 'months'"
+              class="vx-datetimepicker__grid vx-datetimepicker__grid--months"
+            >
+              <button
+                v-for="(m, index) in calendar.monthsShort.value"
+                :key="m"
+                type="button"
+                class="vx-datetimepicker__cell"
+                :class="{ 'vx-datetimepicker__cell--today': calendar.isCurrentMonth(index) }"
+                @click="calendar.pickMonth(index)"
+              >
+                {{ m }}
+              </button>
+            </div>
+
+            <div v-else class="vx-datetimepicker__grid vx-datetimepicker__grid--years">
+              <button
+                v-for="y in calendar.yearsList.value"
+                :key="y"
+                type="button"
+                class="vx-datetimepicker__cell"
+                :class="{ 'vx-datetimepicker__cell--today': calendar.isCurrentYear(y) }"
+                @click="calendar.pickYear(y)"
+              >
+                {{ y }}
+              </button>
+            </div>
+          </div>
+
+          <div
+            v-show="activeTab === 'time'"
+            id="vx-datetimepicker-panel-time"
+            role="tabpanel"
+            aria-labelledby="vx-datetimepicker-tab-time"
+            class="vx-datetimepicker__tabpanel"
+          >
+            <div class="vx-datetimepicker__time-cols">
+              <div class="vx-datetimepicker__time-col">
+                <div class="vx-datetimepicker__time-label">
+                  <Clock :size="13" />
+                  <span>{{ hoursLabel }}</span>
+                </div>
+
+                <div class="vx-datetimepicker__time-list">
+                  <button
+                    v-for="h in hours"
+                    :key="`h-${h}`"
+                    type="button"
+                    class="vx-datetimepicker__time-cell"
+                    :class="{ 'vx-datetimepicker__time-cell--selected': h === pendingHour }"
+                    @click="pickHour(h)"
+                  >
+                    {{ pad(h) }}
+                  </button>
+                </div>
+              </div>
+
+              <div class="vx-datetimepicker__time-col">
+                <div class="vx-datetimepicker__time-label">
+                  <Clock :size="13" />
+                  <span>{{ minutesLabel }}</span>
+                </div>
+
+                <div class="vx-datetimepicker__time-list">
+                  <button
+                    v-for="m in minutes"
+                    :key="`m-${m}`"
+                    type="button"
+                    class="vx-datetimepicker__time-cell"
+                    :class="{ 'vx-datetimepicker__time-cell--selected': m === pendingMinute }"
+                    @click="pickMinute(m)"
+                  >
+                    {{ pad(m) }}
+                  </button>
+                </div>
               </div>
             </div>
           </div>
+
+          <div class="vx-datetimepicker__footer">
+            <button type="button" class="vx-datetimepicker__footer-btn" @click="selectNow">
+              {{ nowLabel }}
+            </button>
+
+            <button
+              v-if="clearable && modelValue"
+              type="button"
+              class="vx-datetimepicker__footer-btn vx-datetimepicker__footer-btn--ghost"
+              @click="onClear"
+            >
+              {{ clearFooterLabel }}
+            </button>
+
+            <button
+              type="button"
+              class="vx-datetimepicker__footer-btn vx-datetimepicker__footer-btn--primary"
+              :disabled="!pendingDate"
+              @click="confirmSelection"
+            >
+              {{ confirmLabel }}
+            </button>
+          </div>
         </div>
-
-        <div class="vx-datetimepicker__footer">
-          <button type="button" class="vx-datetimepicker__footer-btn" @click="selectNow">
-            {{ nowLabel }}
-          </button>
-
-          <button
-            v-if="clearable && modelValue"
-            type="button"
-            class="vx-datetimepicker__footer-btn vx-datetimepicker__footer-btn--ghost"
-            @click="onClear"
-          >
-            {{ clearFooterLabel }}
-          </button>
-
-          <button
-            type="button"
-            class="vx-datetimepicker__footer-btn vx-datetimepicker__footer-btn--primary"
-            :disabled="!pendingDate"
-            @click="confirmSelection"
-          >
-            {{ confirmLabel }}
-          </button>
-        </div>
-      </div>
-    </Transition>
+      </template>
+    </AnchoredOverlay>
   </div>
 </template>
 
 <script setup>
 import { computed, ref, watch } from 'vue'
 import { CalendarClock, ChevronLeft, ChevronRight, Clock, X } from 'lucide-vue-next'
-import VxFieldWrapper from '@/Library/core/components/Input/fieldWrapper.vue'
+import VxFieldWrapper from '@/Library/core/components/Input/FieldWrapper.vue'
 import { useDateFormat } from '@/Library/core/composables/Date/useDateFormat'
 import { useTimeFormat } from '@/Library/core/composables/Date/useTimeFormat'
 import { useCalendarGrid } from '@/Library/core/composables/Date/useCalendarGrid'
-import { useClickOutside } from '@/Library/core/composables/useClickOutside'
-import { useFloatingPanel } from '@/Library/core/composables/Input/useFloatingPanel'
+import AnchoredOverlay from '@/Library/core/components/Picker/AnchoredOverlay.vue'
 
 const props = defineProps({
   modelValue: { type: String, default: '' },
@@ -327,17 +338,8 @@ const props = defineProps({
 const emit = defineEmits(['update:modelValue', 'change', 'focus', 'blur', 'clear'])
 
 const rootRef = ref(null)
-const panelRef = ref(null)
 const isOpen = ref(false)
 const activeTab = ref('date')
-
-const { panelStyle, transitionName, isMobile } = useFloatingPanel(rootRef, panelRef, isOpen, {
-  gap: 8,
-  viewportPadding: 8,
-  modalOnMobile: true,
-  lockScrollOnMobile: true,
-  matchReferenceWidth: false,
-})
 
 const wrapperProps = computed(() => ({
   size: props.size,
@@ -496,10 +498,8 @@ function onFieldFocus(event, chromeFocus) {
   emit('focus', event)
 }
 
-useClickOutside(rootRef, () => {
-  if (!isOpen.value) return
-  isOpen.value = false
-})
+// Click outside, ESC e chiusura da backdrop mobile sono ora gestiti
+// centralmente da AnchoredOverlay: non serve più useClickOutside qui.
 
 const dateDigitsLen = computed(() =>
   dateFormat.formatTemplate.value.reduce((t, s) => t + (s.type !== 'literal' ? s.length : 0), 0)
@@ -675,12 +675,19 @@ function onInputBlur(event, chromeBlur) {
   }
 }
 
+/*
+ * Il posizionamento (position/top/left/transform/z-index/transition) vive
+ * ora dentro <AnchoredOverlay>: qui restano solo le proprietà "visive" del
+ * pannello (dimensioni, sfondo, bordo, ombra).
+ *
+ * Nessun overflow/max-height qui: il pannello non deve mai generare uno
+ * scroll interno, si dimensiona sul proprio contenuto. È `flip` (dentro
+ * useFloatingPanel) a scegliere se aprirsi sopra o sotto l'input in base
+ * allo spazio disponibile, non un contenitore con scrollbar.
+ */
 .vx-datetimepicker__panel {
-  position: absolute;
-  z-index: 50;
   width: 360px;
   max-width: calc(100vw - 16px);
-  max-height: min(560px, calc(100dvh - 16px));
   padding: 12px;
   border-radius: 16px;
   border: 1px solid rgba(0, 0, 0, 0.08);
@@ -689,18 +696,7 @@ function onInputBlur(event, chromeBlur) {
   box-shadow:
     0 10px 24px rgba(0, 0, 0, 0.10),
     0 24px 54px rgba(0, 0, 0, 0.14);
-  overflow: auto;
   box-sizing: border-box;
-  will-change: transform, opacity;
-  backface-visibility: hidden;
-
-  /* Stato "a riposo" per la modal mobile: il centraggio è definito qui via
-     classe CSS (non più come style inline), così le classi della transition
-     possono sovrascrivere transform durante l'animazione senza conflitti
-     di specificità. */
-  &--mobile-modal {
-    transform: translate(-50%, -50%);
-  }
 }
 
 .vx-datetimepicker__summary {
@@ -931,7 +927,6 @@ function onInputBlur(event, chromeBlur) {
 .vx-datetimepicker__time-cols {
   display: flex;
   gap: 6px;
-  max-height: 240px;
 }
 
 .vx-datetimepicker__time-col {
@@ -940,6 +935,7 @@ function onInputBlur(event, chromeBlur) {
   display: flex;
   flex-direction: column;
   gap: 6px;
+  overflow: hidden;
 }
 
 .vx-datetimepicker__time-label {
@@ -954,21 +950,23 @@ function onInputBlur(event, chromeBlur) {
 }
 
 .vx-datetimepicker__time-list {
-  overflow-y: auto;
   display: flex;
   flex-direction: column;
   gap: 2px;
-  max-height: 200px;
-  padding-right: 2px;
+
+  max-height: 220px;
+  overflow-y: auto;
+  overflow-x: hidden;
+
   scrollbar-width: thin;
 
   &::-webkit-scrollbar {
-    width: 4px;
+    width: 6px;
   }
 
   &::-webkit-scrollbar-thumb {
-    background: rgba(0, 0, 0, 0.15);
-    border-radius: 4px;
+    border-radius: 999px;
+    background: rgba(0, 0, 0, 0.2);
   }
 }
 
@@ -1057,52 +1055,6 @@ function onInputBlur(event, chromeBlur) {
   }
 }
 
-.vx-datetimepicker-float-enter-active,
-.vx-datetimepicker-float-leave-active {
-  transition:
-    opacity 180ms cubic-bezier(0.22, 1, 0.36, 1),
-    transform 220ms cubic-bezier(0.16, 1, 0.3, 1),
-    filter 220ms cubic-bezier(0.16, 1, 0.3, 1);
-}
-
-.vx-datetimepicker-float-enter-from,
-.vx-datetimepicker-float-leave-to {
-  opacity: 0;
-  transform: translateY(-6px) scale(0.985);
-  filter: blur(4px);
-}
-
-.vx-datetimepicker-float-enter-to,
-.vx-datetimepicker-float-leave-from {
-  opacity: 1;
-  transform: translateY(0) scale(1);
-  filter: blur(0);
-}
-
-.vx-datetimepicker-mobile-enter-active,
-.vx-datetimepicker-mobile-leave-active {
-  transition:
-    opacity 220ms cubic-bezier(0.22, 1, 0.36, 1),
-    transform 280ms cubic-bezier(0.16, 1, 0.3, 1);
-}
-
-/* FIX: le posizioni di partenza/arrivo sono ora relative al punto di riposo
-   già centrato (translate(-50%, -50%)), applicando solo un piccolo offset
-   verticale + scala. Prima il valore di riposo era impostato inline con lo
-   stesso transform, quindi questi stati "from/to" venivano sovrascritti e
-   l'animazione non partiva mai davvero dal centro. */
-.vx-datetimepicker-mobile-enter-from,
-.vx-datetimepicker-mobile-leave-to {
-  opacity: 0;
-  transform: translate(-50%, calc(-50% + 20px)) scale(0.94);
-}
-
-.vx-datetimepicker-mobile-enter-to,
-.vx-datetimepicker-mobile-leave-from {
-  opacity: 1;
-  transform: translate(-50%, -50%) scale(1);
-}
-
 @media (max-width: 640px) {
   .vx-datetimepicker__panel {
     width: calc(100vw - 16px);
@@ -1133,24 +1085,8 @@ function onInputBlur(event, chromeBlur) {
   .vx-datetimepicker__day,
   .vx-datetimepicker__cell,
   .vx-datetimepicker__time-cell,
-  .vx-datetimepicker__footer-btn,
-  .vx-datetimepicker-float-enter-active,
-  .vx-datetimepicker-float-leave-active,
-  .vx-datetimepicker-mobile-enter-active,
-  .vx-datetimepicker-mobile-leave-active {
+  .vx-datetimepicker__footer-btn {
     transition-duration: 0.01ms !important;
-  }
-
-  .vx-datetimepicker-float-enter-from,
-  .vx-datetimepicker-float-leave-to,
-  .vx-datetimepicker-float-enter-to,
-  .vx-datetimepicker-float-leave-from,
-  .vx-datetimepicker-mobile-enter-from,
-  .vx-datetimepicker-mobile-leave-to,
-  .vx-datetimepicker-mobile-enter-to,
-  .vx-datetimepicker-mobile-leave-from {
-    transform: none !important;
-    filter: none !important;
   }
 }
 </style>

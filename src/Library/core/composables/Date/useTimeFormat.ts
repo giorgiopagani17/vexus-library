@@ -1,102 +1,273 @@
-import { computed } from 'vue'
+import {
+  computed,
+  type ComputedRef,
+  type Ref,
+} from 'vue'
+
+export type TimeSegment =
+  | {
+      type: 'literal'
+      value: string
+    }
+  | {
+      type: 'hour' | 'minute'
+      length: number
+    }
+
+export interface ParsedTimePart {
+  value: number
+  complete: boolean
+}
+
+export interface ParsedTemplateDigits {
+  hour: ParsedTimePart | null
+  minute: ParsedTimePart | null
+}
+
+export interface ParsedHM {
+  hour: number
+  minute: number
+}
+
+export interface UseTimeFormatReturn {
+  formatTemplate: ComputedRef<TimeSegment[]>
+  inputMaxLength: ComputedRef<number>
+  formatTimeWithTemplate: (
+    hour: number | null | undefined,
+    minute: number | null | undefined,
+  ) => string
+  parseTemplateDigits: (
+    digits: string,
+  ) => ParsedTemplateDigits
+  maskDigitsForInput: (
+    digits: string,
+  ) => string
+  parseHM: (
+    value: string | null | undefined,
+  ) => ParsedHM | null
+  toHM: (
+    hour: number,
+    minute: number,
+  ) => string
+  pad2: (
+    value: number,
+  ) => string
+}
 
 /**
  * Gestisce la maschera di formattazione/digitazione di un orario.
- * Token supportati: 'HH' (ore, 24h) e 'mm' (minuti). Default 'HH:mm'.
- * Analogo a useDateFormat ma per HH/mm invece di DD/MM/YYYY.
  *
- * @param {import('vue').Ref<string>|import('vue').ComputedRef<string>} formatRef  prop `format`
+ * Token supportati:
+ * - HH → ore 24h
+ * - mm → minuti
+ *
+ * Default: HH:mm
  */
-export function useTimeFormat(formatRef) {
-  function pad2(n) {
-    return String(n).padStart(2, '0')
+export function useTimeFormat(
+  formatRef: Ref<string | undefined> | ComputedRef<string | undefined>,
+): UseTimeFormatReturn {
+  function pad2(value: number): string {
+    return String(value).padStart(2, '0')
   }
 
-  function buildTemplateFromString(str) {
+  function buildTemplateFromString(
+    str: string,
+  ): TimeSegment[] {
     const tokenRe = /HH|mm/g
-    const segments = []
+
+    const segments: TimeSegment[] = []
+
     let lastIndex = 0
-    let match
+    let match: RegExpExecArray | null
 
     while ((match = tokenRe.exec(str))) {
       if (match.index > lastIndex) {
-        segments.push({ type: 'literal', value: str.slice(lastIndex, match.index) })
+        segments.push({
+          type: 'literal',
+          value: str.slice(lastIndex, match.index),
+        })
       }
-      segments.push({ type: match[0] === 'HH' ? 'hour' : 'minute', length: 2 })
+
+      segments.push({
+        type: match[0] === 'HH' ? 'hour' : 'minute',
+        length: 2,
+      })
+
       lastIndex = tokenRe.lastIndex
     }
+
     if (lastIndex < str.length) {
-      segments.push({ type: 'literal', value: str.slice(lastIndex) })
+      segments.push({
+        type: 'literal',
+        value: str.slice(lastIndex),
+      })
     }
+
     return segments
   }
 
-  const formatTemplate = computed(() => buildTemplateFromString(formatRef.value || 'HH:mm'))
-
-  const inputMaxLength = computed(() =>
-    formatTemplate.value.reduce(
-      (total, seg) => total + (seg.type === 'literal' ? seg.value.length : seg.length),
-      0
-    )
+  const formatTemplate = computed<TimeSegment[]>(() =>
+    buildTemplateFromString(
+      formatRef.value || 'HH:mm',
+    ),
   )
 
-  function formatTimeWithTemplate(hour, minute) {
-    if (hour == null || minute == null) return ''
+  const inputMaxLength = computed<number>(() =>
+    formatTemplate.value.reduce(
+      (total, segment) =>
+        total +
+        (segment.type === 'literal'
+          ? segment.value.length
+          : segment.length),
+      0,
+    ),
+  )
+
+  function formatTimeWithTemplate(
+    hour: number | null | undefined,
+    minute: number | null | undefined,
+  ): string {
+    if (hour == null || minute == null) {
+      return ''
+    }
+
     return formatTemplate.value
-      .map((seg) => {
-        if (seg.type === 'hour') return pad2(hour)
-        if (seg.type === 'minute') return pad2(minute)
-        return seg.value
+      .map((segment) => {
+        if (segment.type === 'hour') {
+          return pad2(hour)
+        }
+
+        if (segment.type === 'minute') {
+          return pad2(minute)
+        }
+
+        return segment.value
       })
       .join('')
   }
 
-  function parseTemplateDigits(digits) {
+  function parseTemplateDigits(
+    digits: string,
+  ): ParsedTemplateDigits {
     let cursor = 0
-    let hour = null
-    let minute = null
 
-    for (const seg of formatTemplate.value) {
-      if (seg.type === 'literal') continue
-      const chunk = digits.slice(cursor, cursor + seg.length)
+    let hour: ParsedTimePart | null = null
+    let minute: ParsedTimePart | null = null
+
+    for (const segment of formatTemplate.value) {
+      if (segment.type === 'literal') {
+        continue
+      }
+
+      const chunk = digits.slice(
+        cursor,
+        cursor + segment.length,
+      )
+
       cursor += chunk.length
-      if (!chunk) continue
-      if (seg.type === 'hour') hour = { value: Number(chunk), complete: chunk.length === seg.length }
-      if (seg.type === 'minute') minute = { value: Number(chunk), complete: chunk.length === seg.length }
+
+      if (!chunk) {
+        continue
+      }
+
+      const parsed: ParsedTimePart = {
+        value: Number(chunk),
+        complete: chunk.length === segment.length,
+      }
+
+      if (segment.type === 'hour') {
+        hour = parsed
+      }
+
+      if (segment.type === 'minute') {
+        minute = parsed
+      }
     }
 
-    return { hour, minute }
+    return {
+      hour,
+      minute,
+    }
   }
 
-  function maskDigitsForInput(digits) {
-    const { hour, minute } = parseTemplateDigits(digits)
-    if (hour?.complete && hour.value > 23) hour.value = 23
-    if (minute?.complete && minute.value > 59) minute.value = 59
+  function maskDigitsForInput(
+    digits: string,
+  ): string {
+    const { hour, minute } =
+      parseTemplateDigits(digits)
+
+    if (hour?.complete && hour.value > 23) {
+      hour.value = 23
+    }
+
+    if (minute?.complete && minute.value > 59) {
+      minute.value = 59
+    }
 
     let cursor = 0
     let result = ''
-    for (const seg of formatTemplate.value) {
-      if (seg.type === 'literal') {
-        if (cursor < digits.length) result += seg.value
+
+    for (const segment of formatTemplate.value) {
+      if (segment.type === 'literal') {
+        if (cursor < digits.length) {
+          result += segment.value
+        }
+
         continue
       }
-      const source = seg.type === 'hour' ? hour : minute
-      if (!source) break
-      const chunkDigits = digits.slice(cursor, cursor + seg.length)
+
+      const source =
+        segment.type === 'hour'
+          ? hour
+          : minute
+
+      if (!source) {
+        break
+      }
+
+      const chunkDigits = digits.slice(
+        cursor,
+        cursor + segment.length,
+      )
+
       cursor += chunkDigits.length
-      result += source.complete ? pad2(source.value).slice(-seg.length) : chunkDigits
+
+      result += source.complete
+        ? pad2(source.value).slice(-segment.length)
+        : chunkDigits
     }
+
     return result
   }
 
-  function parseHM(value) {
-    if (!value) return null
-    const [h, m] = value.split(':').map(Number)
-    if (Number.isNaN(h) || Number.isNaN(m)) return null
-    return { hour: h, minute: m }
+  function parseHM(
+    value: string | null | undefined,
+  ): ParsedHM | null {
+    if (!value) {
+      return null
+    }
+
+    const [h, m] = value
+      .split(':')
+      .map(Number)
+
+    if (
+      Number.isNaN(h) ||
+      Number.isNaN(m)
+    ) {
+      return null
+    }
+
+    return {
+      hour: h,
+      minute: m,
+    }
   }
 
-  function toHM(hour, minute) {
+  function toHM(
+    hour: number,
+    minute: number,
+  ): string {
     return `${pad2(hour)}:${pad2(minute)}`
   }
 
