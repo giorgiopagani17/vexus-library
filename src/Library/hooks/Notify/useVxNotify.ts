@@ -1,5 +1,5 @@
 import { ref, createApp } from 'vue'
-import NotifyContainer from '@/Library/core/utils/Notify/NotifyContainer.vue'
+import NotifyContainer from '@/Library/core/components/Notify/NotifyContainer.vue'
 
 /* =========================
    Types

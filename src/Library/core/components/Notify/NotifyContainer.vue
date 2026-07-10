@@ -18,7 +18,7 @@
 
 <script setup>
 import { notifications, useVxNotify } from '@/Library/hooks/Notify/useVxNotify'
-import Notify from '@/Library/core/utils/Notify/Notify.vue'
+import Notify from '@/Library/core/components/Notify/Notify.vue'
 
 const { dismiss } = useVxNotify()
 

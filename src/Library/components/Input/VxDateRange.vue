@@ -14,7 +14,7 @@
           tabindex="-1"
           aria-haspopup="dialog"
           :aria-expanded="isOpen"
-          :aria-label="resolvedLabels.openLabel"
+          aria-label="Open date range picker"
           @mousedown.prevent
           @click="openPicker"
         >
@@ -23,6 +23,7 @@
           </slot>
         </button>
       </template>
+
       <template #default="{ fieldId, disabled: fieldDisabled, onFocus: chromeFocus, onBlur: chromeBlur }">
         <input
           :id="fieldId"
@@ -30,7 +31,7 @@
           class="vx-daterange__input"
           :value="inputValue"
           :disabled="fieldDisabled || loading"
-          :placeholder="resolvedLabels.placeholder"
+          :placeholder="placeholder"
           autocomplete="off"
           @focus="() => { openPicker(); chromeFocus?.() }"
           @input="onInput"
@@ -44,7 +45,7 @@
           type="button"
           class="vx-daterange__clear"
           tabindex="-1"
-          :aria-label="resolvedLabels.clear"
+          aria-label="Clear date range"
           @mousedown.prevent
           @click="onClear"
         >
@@ -54,23 +55,45 @@
     </VxFieldWrapper>
 
     <Transition name="vx-daterange-fade">
-      <div v-if="isOpen" class="vx-daterange__panel" role="dialog" :aria-label="resolvedLabels.dialogLabel">
+      <div
+        v-if="isOpen"
+        ref="panelRef"
+        class="vx-daterange__panel"
+        role="dialog"
+        aria-label="Date range picker dialog"
+        :style="panelStyle"
+      >
         <div class="vx-daterange__nav">
-          <button type="button" class="vx-daterange__nav-btn" :aria-label="resolvedLabels.prev" @click="calendar.navPrev">
+          <button
+            type="button"
+            class="vx-daterange__nav-btn"
+            aria-label="Previous month"
+            @click="calendar.navPrev"
+          >
             <ChevronLeft :size="16" />
           </button>
+
           <button type="button" class="vx-daterange__month" @click="calendar.onHeaderClick">
             {{ calendar.headerLabel.value }}
           </button>
-          <button type="button" class="vx-daterange__nav-btn" :aria-label="resolvedLabels.next" @click="calendar.navNext">
+
+          <button
+            type="button"
+            class="vx-daterange__nav-btn"
+            aria-label="Next month"
+            @click="calendar.navNext"
+          >
             <ChevronRight :size="16" />
           </button>
         </div>
 
         <template v-if="calendar.viewMode.value === 'days'">
           <div class="vx-daterange__weekdays">
-            <span v-for="(day, index) in calendar.weekDays.value" :key="`${day}-${index}`">{{ day }}</span>
+            <span v-for="(day, index) in calendar.weekDays.value" :key="`${day}-${index}`">
+              {{ day }}
+            </span>
           </div>
+
           <div class="vx-daterange__grid" @mouseleave="hoverDate = null">
             <button
               v-for="(date, index) in calendar.calendarDays.value"
@@ -87,7 +110,10 @@
           </div>
         </template>
 
-        <div v-else-if="calendar.viewMode.value === 'months'" class="vx-daterange__grid vx-daterange__grid--months">
+        <div
+          v-else-if="calendar.viewMode.value === 'months'"
+          class="vx-daterange__grid vx-daterange__grid--months"
+        >
           <button
             v-for="(m, index) in calendar.monthsShort.value"
             :key="m"
@@ -115,12 +141,11 @@
 
         <div v-if="clearable && (modelValue?.start || modelValue?.end)" class="vx-daterange__footer">
           <button
-            v-if="clearable && (modelValue?.start || modelValue?.end)"
             type="button"
             class="vx-daterange__footer-btn vx-daterange__footer-btn--ghost"
             @click="onClear"
           >
-            {{ resolvedLabels.clearFooter }}
+            {{ clearFooterLabel }}
           </button>
         </div>
       </div>
@@ -131,77 +156,143 @@
 <script setup>
 import { computed, ref, watch } from 'vue'
 import { CalendarRange, ChevronLeft, ChevronRight, X } from 'lucide-vue-next'
-import VxFieldWrapper from '@/Library/core/utils/Input/fieldWrapper.vue'
+import VxFieldWrapper from '@/Library/core/components/Input/fieldWrapper.vue'
 import { useDateFormat } from '@/Library/core/composables/Date/useDateFormat'
 import { useCalendarGrid } from '@/Library/core/composables/Date/useCalendarGrid'
 import { useClickOutside } from '@/Library/core/composables/useClickOutside'
-
-const BASE_LABELS = {
-  it: {
-    placeholder: 'Seziona un intervallo di date',
-    rangeSeparator: '-',
-    clear: 'Cancella',
-    clearFooter: 'Pulisci',
-    prev: 'Precedente',
-    next: 'Successivo',
-    dialogLabel: 'Seleziona un intervallo di date',
-    openLabel: 'Apri selezione intervallo',
-    pickStart: 'Seleziona la data di inizio',
-    pickEnd: 'Seleziona la data di fine',
-  },
-  en: {
-    placeholder: 'Select a date range',
-    rangeSeparator: '-',
-    clear: 'Clear',
-    clearFooter: 'Clear',
-    prev: 'Previous',
-    next: 'Next',
-    dialogLabel: 'Select a date range',
-    openLabel: 'Open range picker',
-    pickStart: 'Select the start date',
-    pickEnd: 'Select the end date',
-  },
-}
+import { useFloatingPanel } from '@/Library/core/composables/Input/useFloatingPanel'
+import { useCloseWhenReferenceHidden } from '@/Library/core/composables/Input/useCloseWhenReferenceHidden'
 
 const props = defineProps({
-  /** Intervallo selezionato: { start: 'YYYY-MM-DD', end: 'YYYY-MM-DD' } (v-model) */
-  modelValue: { type: Object, default: () => ({ start: '', end: '' }) },
-  min: { type: String, default: '' },
-  max: { type: String, default: '' },
-  locale: { type: String, default: 'it-IT' },
-  /** Maschera data (token DD/MM/YYYY). Se omessa, dedotta dal locale. */
-  format: { type: String, default: '' },
-  firstDayOfWeek: { type: Number, default: null },
-  labels: { type: Object, default: null },
-  variant: { type: String, default: 'outline' },
-  color: { type: String, default: '#7c3aed' },
-  colors: { type: Object, default: null },
-  size: { type: [String, Object], default: 'md' },
-  disabled: { type: Boolean, default: false },
-  loading: { type: Boolean, default: false },
-  block: { type: Boolean, default: false },
-  pill: { type: Boolean, default: false },
-  radius: { type: [Number, String], default: null },
-  icon: { type: [Object, Function], default: null },
-  /** Posizione dell'icona in entrambi i campi: 'left' | 'right' */
-  iconPosition: { type: String, default: 'right' },
-  iconSize: { type: [Number, String], default: null },
-  clearable: { type: Boolean, default: false },
-  label: { type: String, default: '' },
-  hint: { type: String, default: '' },
-  error: { type: Boolean, default: false },
-  errorMessage: { type: String, default: '' },
-  focusEffect: { type: String, default: 'ring' },
+  modelValue: {
+    type: Object,
+    default: () => ({ start: '', end: '' }),
+  },
+  min: {
+    type: String,
+    default: '',
+  },
+  max: {
+    type: String,
+    default: '',
+  },
+  locale: {
+    type: String,
+    default: 'en-US',
+  },
+  format: {
+    type: String,
+    default: '',
+  },
+  firstDayOfWeek: {
+    type: Number,
+    default: null,
+  },
+  variant: {
+    type: String,
+    default: 'outline',
+  },
+  color: {
+    type: String,
+    default: '#7c3aed',
+  },
+  colors: {
+    type: Object,
+    default: null,
+  },
+  size: {
+    type: [String, Object],
+    default: 'md',
+  },
+  disabled: {
+    type: Boolean,
+    default: false,
+  },
+  loading: {
+    type: Boolean,
+    default: false,
+  },
+  block: {
+    type: Boolean,
+    default: false,
+  },
+  pill: {
+    type: Boolean,
+    default: false,
+  },
+  radius: {
+    type: [Number, String],
+    default: null,
+  },
+  icon: {
+    type: [Object, Function],
+    default: null,
+  },
+  iconPosition: {
+    type: String,
+    default: 'right',
+  },
+  iconSize: {
+    type: [Number, String],
+    default: null,
+  },
+  clearable: {
+    type: Boolean,
+    default: false,
+  },
+  placeholder: {
+    type: String,
+    default: 'Select a date range',
+  },
+  rangeSeparator: {
+    type: String,
+    default: '-',
+  },
+  clearFooterLabel: {
+    type: String,
+    default: 'Clear',
+  },
+  label: {
+    type: String,
+    default: '',
+  },
+  hint: {
+    type: String,
+    default: '',
+  },
+  error: {
+    type: Boolean,
+    default: false,
+  },
+  errorMessage: {
+    type: String,
+    default: '',
+  },
+  focusEffect: {
+    type: String,
+    default: 'ring',
+  },
 })
 
 const emit = defineEmits(['update:modelValue', 'change', 'clear'])
 
 const rootRef = ref(null)
+const panelRef = ref(null)
 const isOpen = ref(false)
 const hoverDate = ref(null)
 
+const { panelStyle } = useFloatingPanel(rootRef, panelRef, isOpen, {
+  gap: 6,
+  viewportPadding: 8,
+})
+
+useCloseWhenReferenceHidden(rootRef, isOpen, () => {
+  isOpen.value = false
+})
+
 const wrapperProps = computed(() => ({
   size: props.size,
+  block: props.block,
   variant: props.variant,
   pill: props.pill,
   radius: props.radius,
@@ -213,18 +304,13 @@ const wrapperProps = computed(() => ({
   error: props.error,
   errorMessage: props.errorMessage,
   hint: props.hint,
+  label: props.label,
   icon: props.icon,
   iconPosition: props.iconPosition,
   iconSize: props.iconSize,
 }))
 
 const iconSlotName = computed(() => `icon-${props.iconPosition === 'left' ? 'left' : 'right'}`)
-
-const lang = computed(() => (props.locale || 'it').split('-')[0].toLowerCase())
-const resolvedLabels = computed(() => ({
-  ...(BASE_LABELS[lang.value] || BASE_LABELS.it),
-  ...(props.labels || {}),
-}))
 
 const resolvedFirstDayOfWeek = computed(() => {
   if (props.firstDayOfWeek !== null && props.firstDayOfWeek !== undefined) return props.firstDayOfWeek
@@ -245,7 +331,6 @@ const calendar = useCalendarGrid({
   initialDate: startDate.value,
 })
 
-// Stato "in sospeso" durante la selezione nel pannello.
 const pendingStart = ref(startDate.value)
 const pendingEnd = ref(endDate.value)
 
@@ -263,12 +348,11 @@ function isDayDisabled(date) {
 
 function dayClasses(date) {
   if (!date) return { 'vx-daterange__day--empty': true }
+
   const rangeEnd = pendingEnd.value || (pendingStart.value && !pendingEnd.value ? hoverDate.value : null)
-  const inRange =
-    pendingStart.value &&
-    rangeEnd &&
-    date > (pendingStart.value < rangeEnd ? pendingStart.value : rangeEnd) &&
-    date < (pendingStart.value < rangeEnd ? rangeEnd : pendingStart.value)
+  const minDate = pendingStart.value && rangeEnd && pendingStart.value < rangeEnd ? pendingStart.value : rangeEnd
+  const maxDate = pendingStart.value && rangeEnd && pendingStart.value < rangeEnd ? rangeEnd : pendingStart.value
+  const inRange = pendingStart.value && rangeEnd && date > minDate && date < maxDate
 
   return {
     'vx-daterange__day--today': calendar.isToday(date),
@@ -279,7 +363,10 @@ function dayClasses(date) {
 }
 
 function commitRange(start, end) {
-  const value = { start: start ? dateFormat.toISO(start) : '', end: end ? dateFormat.toISO(end) : '' }
+  const value = {
+    start: start ? dateFormat.toISO(start) : '',
+    end: end ? dateFormat.toISO(end) : '',
+  }
   emit('update:modelValue', value)
   emit('change', value)
 }
@@ -288,19 +375,18 @@ function selectDay(date) {
   if (!date || isDayDisabled(date)) return
 
   if (!pendingStart.value || pendingEnd.value) {
-    // Nuovo inizio selezione
     pendingStart.value = date
     pendingEnd.value = null
     return
   }
 
-  // Secondo click: chiude il range, riordinando se necessario
   if (date < pendingStart.value) {
     pendingEnd.value = pendingStart.value
     pendingStart.value = date
   } else {
     pendingEnd.value = date
   }
+
   commitRange(pendingStart.value, pendingEnd.value)
   isOpen.value = false
 }
@@ -310,6 +396,7 @@ function onClear(event) {
   pendingStart.value = null
   pendingEnd.value = null
   emit('update:modelValue', { start: '', end: '' })
+  emit('change', { start: '', end: '' })
   emit('clear')
 }
 
@@ -319,16 +406,20 @@ function openFor(field) {
   calendar.resetToDate((field === 'end' ? endDate.value : startDate.value) ?? new Date())
 }
 
+function openPicker() {
+  if (props.disabled || props.loading) return
+  isOpen.value = true
+  calendar.resetToDate(startDate.value ?? endDate.value ?? new Date())
+}
+
 useClickOutside(rootRef, () => {
   isOpen.value = false
 })
 
-// ===== Digitazione manuale del range =====
-
 const displayValue = computed(() => {
   const start = dateFormat.formatDateWithTemplate(startDate.value)
   const end = dateFormat.formatDateWithTemplate(endDate.value)
-  if (start && end) return `${start} ${resolvedLabels.value.rangeSeparator} ${end}`
+  if (start && end) return `${start} ${props.rangeSeparator} ${end}`
   return start || end || ''
 })
 
@@ -338,33 +429,51 @@ watch(
   () => [props.modelValue?.start, props.modelValue?.end],
   () => {
     inputValue.value = displayValue.value
+    pendingStart.value = startDate.value
+    pendingEnd.value = endDate.value
   }
 )
 
-const rangeSeparatorPattern = /\s*(?:→|—|–|to)\s*/i
+const rangeSeparatorPattern = /\s*(?:→|—|–|-|to)\s*/i
 
 function tryParseComplete(raw) {
   const digits = raw.replace(/\D/g, '')
   const { day, month, year } = dateFormat.parseTemplateDigits(digits)
-  if (!day?.complete || !month?.complete || !year?.complete || String(year.value).length < 4) return null
-  const date = new Date(year.value, month.value - 1, day.value)
-  if (date.getFullYear() !== year.value || date.getMonth() !== month.value - 1 || date.getDate() !== day.value) {
+
+  if (!day?.complete || !month?.complete || !year?.complete || String(year.value).length < 4) {
     return null
   }
+
+  const date = new Date(year.value, month.value - 1, day.value)
+
+  if (
+    date.getFullYear() !== year.value ||
+    date.getMonth() !== month.value - 1 ||
+    date.getDate() !== day.value
+  ) {
+    return null
+  }
+
   if (isDayDisabled(date)) return null
   return date
 }
 
 function parseRangeText(raw) {
-  const parts = raw.split(rangeSeparatorPattern).map((part) => part.trim()).filter(Boolean)
+  const parts = raw
+    .split(rangeSeparatorPattern)
+    .map((part) => part.trim())
+    .filter(Boolean)
+
   if (!parts.length) return null
 
   const start = tryParseComplete(parts[0])
+
   if (parts.length === 1) {
     return start ? { start, end: null } : null
   }
 
   const end = tryParseComplete(parts.slice(1).join(' '))
+
   if (!start || !end) return null
 
   return start <= end ? { start, end } : { start: end, end: start }
@@ -386,6 +495,7 @@ function commitInput() {
   }
 
   const parsed = parseRangeText(raw)
+
   if (!parsed) {
     inputValue.value = displayValue.value
     return
@@ -394,12 +504,6 @@ function commitInput() {
   pendingStart.value = parsed.start
   pendingEnd.value = parsed.end
   commitRange(parsed.start, parsed.end)
-}
-
-function openPicker() {
-  if (props.disabled || props.loading) return
-  isOpen.value = true
-  calendar.resetToDate(startDate.value ?? endDate.value ?? new Date())
 }
 
 function onEnter(event) {
@@ -423,7 +527,7 @@ function onFieldBlur(event, chromeBlur) {
     display: flex;
     width: 100%;
 
-    .vx-daterange__fields {
+    .vx-daterange__field {
       width: 100%;
     }
   }
@@ -483,8 +587,6 @@ function onFieldBlur(event, chromeBlur) {
 
 .vx-daterange__panel {
   position: absolute;
-  top: calc(100% + 6px);
-  left: 0;
   z-index: 50;
   width: 260px;
   padding: 12px;

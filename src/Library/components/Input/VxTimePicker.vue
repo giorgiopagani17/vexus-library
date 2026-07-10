@@ -14,7 +14,7 @@
           tabindex="-1"
           aria-haspopup="dialog"
           :aria-expanded="isOpen"
-          aria-label="Apri selezione orario"
+          :aria-label="openLabel"
           @mousedown.prevent
           @click="toggleOpen"
         >
@@ -39,7 +39,7 @@
           :maxlength="timeFormat.inputMaxLength.value"
           @input="onInput"
           @keydown.enter="onEnter"
-          @focus="chromeFocus"
+          @focus="onInputFocus($event, chromeFocus)"
           @blur="onInputBlur($event, chromeBlur)"
         />
       </template>
@@ -49,7 +49,7 @@
           type="button"
           class="vx-timepicker__clear"
           tabindex="-1"
-          aria-label="Cancella"
+          :aria-label="clearLabel"
           @mousedown.prevent
           @click="onClear"
         >
@@ -59,7 +59,14 @@
     </VxFieldWrapper>
 
     <Transition name="vx-timepicker-fade">
-      <div v-if="isOpen" class="vx-timepicker__panel" role="dialog" aria-label="Seleziona un orario">
+      <div
+        v-if="isOpen"
+        ref="panelRef"
+        class="vx-timepicker__panel"
+        role="dialog"
+        :aria-label="dialogLabel"
+        :style="panelStyle"
+      >
         <div class="vx-timepicker__cols">
           <div class="vx-timepicker__col">
             <button
@@ -73,6 +80,7 @@
               {{ pad(h) }}
             </button>
           </div>
+
           <div class="vx-timepicker__col">
             <button
               v-for="m in minutes"
@@ -93,7 +101,7 @@
             class="vx-timepicker__footer-btn vx-timepicker__footer-btn--ghost"
             @click="onClear"
           >
-            Pulisci
+            {{ clearFooterLabel }}
           </button>
         </div>
       </div>
@@ -104,27 +112,21 @@
 <script setup>
 import { computed, ref, watch } from 'vue'
 import { Clock, X } from 'lucide-vue-next'
-import VxFieldWrapper from '@/Library/core/utils/Input/fieldWrapper.vue'
+import VxFieldWrapper from '@/Library/core/components/Input/fieldWrapper.vue'
 import { useTimeFormat } from '@/Library/core/composables/Date/useTimeFormat'
 import { useClickOutside } from '@/Library/core/composables/useClickOutside'
+import { useCloseWhenReferenceHidden } from '@/Library/core/composables/Input/useCloseWhenReferenceHidden'
+import { useFloatingPanel } from '@/Library/core/composables/Input/useFloatingPanel'
 
 const props = defineProps({
-  /** Orario selezionato, sempre in formato canonico 'HH:MM' 24h (v-model) */
   modelValue: {
     type: String,
     default: '',
   },
-  /** Intervallo tra un'opzione e l'altra nella colonna minuti */
   minuteStep: {
     type: Number,
     default: 5,
   },
-  /**
-   * Maschera di visualizzazione/digitazione, con token 'HH' e 'mm' e
-   * separatore a piacere (es. 'HH:mm', 'HH.mm', 'HHmm'). Default 'HH:mm'.
-   * Nota: il v-model resta sempre 'HH:MM' indipendentemente dal separatore
-   * scelto qui, che riguarda solo la resa nel campo di testo.
-   */
   format: {
     type: String,
     default: 'HH:mm',
@@ -169,7 +171,6 @@ const props = defineProps({
     type: [Object, Function],
     default: null,
   },
-  /** Posizione dell'icona del picker nel campo: 'left' | 'right' */
   iconPosition: {
     type: String,
     default: 'right',
@@ -184,7 +185,23 @@ const props = defineProps({
   },
   placeholder: {
     type: String,
-    default: 'Seleziona un orario',
+    default: 'Select a time',
+  },
+  openLabel: {
+    type: String,
+    default: 'Open time picker',
+  },
+  clearLabel: {
+    type: String,
+    default: 'Clear',
+  },
+  dialogLabel: {
+    type: String,
+    default: 'Select a time',
+  },
+  clearFooterLabel: {
+    type: String,
+    default: 'Clear',
   },
   label: {
     type: String,
@@ -211,7 +228,17 @@ const props = defineProps({
 const emit = defineEmits(['update:modelValue', 'change', 'focus', 'blur', 'clear'])
 
 const rootRef = ref(null)
+const panelRef = ref(null)
 const isOpen = ref(false)
+
+const { panelStyle } = useFloatingPanel(rootRef, panelRef, isOpen, {
+  gap: 6,
+  viewportPadding: 8,
+})
+
+useCloseWhenReferenceHidden(rootRef, isOpen, () => {
+  isOpen.value = false
+})
 
 const wrapperProps = computed(() => ({
   size: props.size,
@@ -233,13 +260,13 @@ const wrapperProps = computed(() => ({
   iconSize: props.iconSize,
 }))
 
-// Nome dello slot dell'icona da valorizzare nel VxFieldWrapper,
-// in base a `iconPosition` ('left' | 'right').
 const iconSlotName = computed(() => `icon-${props.iconPosition === 'left' ? 'left' : 'right'}`)
 
-const pad = (n) => String(n).padStart(2, '0')
+const timeFormat = useTimeFormat(computed(() => props.format))
 
+const pad = (n) => String(n).padStart(2, '0')
 const hours = Array.from({ length: 24 }, (_, i) => i)
+
 const minutes = computed(() => {
   const step = props.minuteStep > 0 ? props.minuteStep : 5
   const list = []
@@ -256,6 +283,20 @@ const selectedMinute = computed(() => {
   if (!props.modelValue) return null
   return Number(props.modelValue.split(':')[1])
 })
+
+const displayValue = computed(() => {
+  if (selectedHour.value === null || selectedMinute.value === null) return ''
+  return timeFormat.formatTimeWithTemplate(selectedHour.value, selectedMinute.value)
+})
+
+const inputValue = ref(displayValue.value)
+
+watch(
+  () => props.modelValue,
+  () => {
+    inputValue.value = displayValue.value
+  }
+)
 
 function commit(hour, minute) {
   const h = hour ?? selectedHour.value ?? 0
@@ -274,9 +315,20 @@ function pickMinute(m) {
   isOpen.value = false
 }
 
+function openPicker() {
+  if (props.disabled || props.loading) return
+  isOpen.value = true
+}
+
 function toggleOpen() {
   if (props.disabled || props.loading) return
   isOpen.value = !isOpen.value
+}
+
+function onInputFocus(event, chromeFocus) {
+  openPicker()
+  chromeFocus?.(event)
+  emit('focus', event)
 }
 
 function onClear(event) {
@@ -288,24 +340,6 @@ function onClear(event) {
 useClickOutside(rootRef, () => {
   isOpen.value = false
 })
-
-// ===== Maschera / digitazione manuale dell'orario, via composable =====
-
-const timeFormat = useTimeFormat(computed(() => props.format))
-
-const displayValue = computed(() => {
-  if (selectedHour.value === null || selectedMinute.value === null) return ''
-  return timeFormat.formatTimeWithTemplate(selectedHour.value, selectedMinute.value)
-})
-
-const inputValue = ref(displayValue.value)
-
-watch(
-  () => props.modelValue,
-  () => {
-    inputValue.value = displayValue.value
-  }
-)
 
 function onInput(event) {
   const digits = event.target.value.replace(/\D/g, '')
@@ -327,8 +361,6 @@ function commitInput() {
   const digits = raw.replace(/\D/g, '')
   const { hour, minute } = timeFormat.parseTemplateDigits(digits)
 
-  // Digitazione parziale: se manca l'ora o i minuti, completa con "00"
-  // invece di scartare quanto scritto (comportamento storico del componente).
   const h = Math.min(hour?.complete ? hour.value : hour?.value ?? 0, 23)
   const m = Math.min(minute?.complete ? minute.value : 0, 59)
 
@@ -349,6 +381,7 @@ function onEnter(event) {
 function onInputBlur(event, chromeBlur) {
   commitInput()
   chromeBlur?.(event)
+  emit('blur', event)
 }
 </script>
 
@@ -432,8 +465,6 @@ function onInputBlur(event, chromeBlur) {
 
 .vx-timepicker__panel {
   position: absolute;
-  top: calc(100% + 6px);
-  left: 0;
   z-index: 50;
   display: flex;
   flex-direction: column;

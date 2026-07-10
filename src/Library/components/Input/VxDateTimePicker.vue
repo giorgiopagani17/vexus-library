@@ -14,7 +14,7 @@
           tabindex="-1"
           aria-haspopup="dialog"
           :aria-expanded="isOpen"
-          :aria-label="resolvedLabels.openLabel"
+          aria-label="Open date and time picker"
           @mousedown.prevent
           @click="toggleOpen"
         >
@@ -33,13 +33,13 @@
           class="vx-datetimepicker__input"
           :value="inputValue"
           :disabled="fieldDisabled || loading"
-          :placeholder="effectivePlaceholder"
+          :placeholder="placeholder"
           :maxlength="combinedMaxLength"
           inputmode="numeric"
           autocomplete="off"
           @input="onInput"
           @keydown.enter="onEnter"
-          @focus="chromeFocus"
+          @focus="onFieldFocus($event, chromeFocus)"
           @blur="onInputBlur($event, chromeBlur)"
         />
       </template>
@@ -49,7 +49,7 @@
           type="button"
           class="vx-datetimepicker__clear"
           tabindex="-1"
-          :aria-label="resolvedLabels.clear"
+          aria-label="Clear date and time"
           @mousedown.prevent
           @click="onClear"
         >
@@ -58,129 +58,216 @@
       </template>
     </VxFieldWrapper>
 
-    <Transition name="vx-datetimepicker-fade">
-      <div v-if="isOpen" class="vx-datetimepicker__panel" role="dialog" :aria-label="resolvedLabels.dialogLabel">
-        <div class="vx-datetimepicker__nav">
-          <button type="button" class="vx-datetimepicker__nav-btn" :aria-label="resolvedLabels.prev" @click="calendar.navPrev">
-            <ChevronLeft :size="16" />
+    <Transition :name="transitionName" appear>
+      <div
+        v-if="isOpen"
+        ref="panelRef"
+        class="vx-datetimepicker__panel"
+        :class="{ 'vx-datetimepicker__panel--mobile-modal': isMobile }"
+        role="dialog"
+        aria-label="Date and time picker dialog"
+        :style="panelStyle"
+      >
+        <div class="vx-datetimepicker__summary">
+          <div class="vx-datetimepicker__summary-label">
+            {{ summaryLabel }}
+          </div>
+
+          <div class="vx-datetimepicker__summary-main">
+            {{ pendingDate ? dateFormat.formatDateWithTemplate(pendingDate) : placeholder }}
+          </div>
+
+          <div v-if="pendingDate" class="vx-datetimepicker__summary-sub">
+            {{ timeFormat.formatTimeWithTemplate(pendingHour, pendingMinute) }}
+          </div>
+        </div>
+
+        <div class="vx-datetimepicker__tabs" role="tablist" aria-label="Date and time sections">
+          <button
+            id="vx-datetimepicker-tab-date"
+            type="button"
+            role="tab"
+            class="vx-datetimepicker__tab"
+            :class="{ 'vx-datetimepicker__tab--active': activeTab === 'date' }"
+            :aria-selected="activeTab === 'date'"
+            aria-controls="vx-datetimepicker-panel-date"
+            @click="activeTab = 'date'"
+          >
+            {{ dateTabLabel }}
           </button>
-          <button type="button" class="vx-datetimepicker__month" @click="calendar.onHeaderClick">
-            {{ calendar.headerLabel.value }}
-          </button>
-          <button type="button" class="vx-datetimepicker__nav-btn" :aria-label="resolvedLabels.next" @click="calendar.navNext">
-            <ChevronRight :size="16" />
+
+          <button
+            id="vx-datetimepicker-tab-time"
+            type="button"
+            role="tab"
+            class="vx-datetimepicker__tab"
+            :class="{ 'vx-datetimepicker__tab--active': activeTab === 'time' }"
+            :aria-selected="activeTab === 'time'"
+            aria-controls="vx-datetimepicker-panel-time"
+            @click="activeTab = 'time'"
+          >
+            {{ timeTabLabel }}
           </button>
         </div>
 
-        <template v-if="calendar.viewMode.value === 'days'">
-          <div class="vx-datetimepicker__weekdays">
-            <span v-for="(day, index) in calendar.weekDays.value" :key="`${day}-${index}`">{{ day }}</span>
-          </div>
-          <div class="vx-datetimepicker__grid">
+        <div
+          v-show="activeTab === 'date'"
+          id="vx-datetimepicker-panel-date"
+          role="tabpanel"
+          aria-labelledby="vx-datetimepicker-tab-date"
+          class="vx-datetimepicker__tabpanel"
+        >
+          <div class="vx-datetimepicker__nav">
             <button
-              v-for="(date, index) in calendar.calendarDays.value"
-              :key="index"
               type="button"
-              class="vx-datetimepicker__day"
-              :class="{
-                'vx-datetimepicker__day--empty': !date,
-                'vx-datetimepicker__day--today': date && calendar.isToday(date),
-                'vx-datetimepicker__day--selected': date && isSelectedDay(date),
-              }"
-              :disabled="!date || isDayDisabled(date)"
-              @click="selectDay(date)"
+              class="vx-datetimepicker__nav-btn"
+              aria-label="Previous month"
+              @click="calendar.navPrev"
             >
-              {{ date ? date.getDate() : '' }}
+              <ChevronLeft :size="16" />
+            </button>
+
+            <button type="button" class="vx-datetimepicker__month" @click="calendar.onHeaderClick">
+              {{ calendar.headerLabel.value }}
+            </button>
+
+            <button
+              type="button"
+              class="vx-datetimepicker__nav-btn"
+              aria-label="Next month"
+              @click="calendar.navNext"
+            >
+              <ChevronRight :size="16" />
             </button>
           </div>
-        </template>
 
-        <div v-else-if="calendar.viewMode.value === 'months'" class="vx-datetimepicker__grid vx-datetimepicker__grid--months">
-          <button
-            v-for="(m, index) in calendar.monthsShort.value"
-            :key="m"
-            type="button"
-            class="vx-datetimepicker__cell"
-            :class="{ 'vx-datetimepicker__cell--today': calendar.isCurrentMonth(index) }"
-            @click="calendar.pickMonth(index)"
-          >
-            {{ m }}
-          </button>
-        </div>
-
-        <div v-else class="vx-datetimepicker__grid vx-datetimepicker__grid--years">
-          <button
-            v-for="y in calendar.yearsList.value"
-            :key="y"
-            type="button"
-            class="vx-datetimepicker__cell"
-            :class="{ 'vx-datetimepicker__cell--today': calendar.isCurrentYear(y) }"
-            @click="calendar.pickYear(y)"
-          >
-            {{ y }}
-          </button>
-        </div>
-
-        <!-- Selettore orario più ampio e leggibile -->
-        <div class="vx-datetimepicker__time">
-          <div class="vx-datetimepicker__time-section">
-            <div class="vx-datetimepicker__time-label">
-              <Clock :size="13" />
-              <span>Ore</span>
+          <template v-if="calendar.viewMode.value === 'days'">
+            <div class="vx-datetimepicker__weekdays">
+              <span v-for="(day, index) in calendar.weekDays.value" :key="`${day}-${index}`">
+                {{ day }}
+              </span>
             </div>
-            <div class="vx-datetimepicker__time-grid">
+
+            <div class="vx-datetimepicker__grid">
               <button
-                v-for="h in hours"
-                :key="`h-${h}`"
+                v-for="(date, index) in calendar.calendarDays.value"
+                :key="index"
                 type="button"
-                class="vx-datetimepicker__time-cell"
-                :class="{ 'vx-datetimepicker__time-cell--selected': h === pendingHour }"
-                @click="pendingHour = h"
+                class="vx-datetimepicker__day"
+                :class="{
+                  'vx-datetimepicker__day--empty': !date,
+                  'vx-datetimepicker__day--today': date && calendar.isToday(date),
+                  'vx-datetimepicker__day--selected': date && isSelectedDay(date),
+                }"
+                :disabled="!date || isDayDisabled(date)"
+                @click="selectDay(date)"
               >
-                {{ pad(h) }}
+                {{ date ? date.getDate() : '' }}
               </button>
             </div>
+          </template>
+
+          <div
+            v-else-if="calendar.viewMode.value === 'months'"
+            class="vx-datetimepicker__grid vx-datetimepicker__grid--months"
+          >
+            <button
+              v-for="(m, index) in calendar.monthsShort.value"
+              :key="m"
+              type="button"
+              class="vx-datetimepicker__cell"
+              :class="{ 'vx-datetimepicker__cell--today': calendar.isCurrentMonth(index) }"
+              @click="calendar.pickMonth(index)"
+            >
+              {{ m }}
+            </button>
           </div>
 
-          <div class="vx-datetimepicker__time-section">
-            <div class="vx-datetimepicker__time-label">
-              <Clock :size="13" />
-              <span>Minuti</span>
+          <div v-else class="vx-datetimepicker__grid vx-datetimepicker__grid--years">
+            <button
+              v-for="y in calendar.yearsList.value"
+              :key="y"
+              type="button"
+              class="vx-datetimepicker__cell"
+              :class="{ 'vx-datetimepicker__cell--today': calendar.isCurrentYear(y) }"
+              @click="calendar.pickYear(y)"
+            >
+              {{ y }}
+            </button>
+          </div>
+        </div>
+
+        <div
+          v-show="activeTab === 'time'"
+          id="vx-datetimepicker-panel-time"
+          role="tabpanel"
+          aria-labelledby="vx-datetimepicker-tab-time"
+          class="vx-datetimepicker__tabpanel"
+        >
+          <div class="vx-datetimepicker__time-cols">
+            <div class="vx-datetimepicker__time-col">
+              <div class="vx-datetimepicker__time-label">
+                <Clock :size="13" />
+                <span>{{ hoursLabel }}</span>
+              </div>
+
+              <div class="vx-datetimepicker__time-list">
+                <button
+                  v-for="h in hours"
+                  :key="`h-${h}`"
+                  type="button"
+                  class="vx-datetimepicker__time-cell"
+                  :class="{ 'vx-datetimepicker__time-cell--selected': h === pendingHour }"
+                  @click="pickHour(h)"
+                >
+                  {{ pad(h) }}
+                </button>
+              </div>
             </div>
-            <div class="vx-datetimepicker__time-grid">
-              <button
-                v-for="m in minutes"
-                :key="`m-${m}`"
-                type="button"
-                class="vx-datetimepicker__time-cell"
-                :class="{ 'vx-datetimepicker__time-cell--selected': m === pendingMinute }"
-                @click="pendingMinute = m"
-              >
-                {{ pad(m) }}
-              </button>
+
+            <div class="vx-datetimepicker__time-col">
+              <div class="vx-datetimepicker__time-label">
+                <Clock :size="13" />
+                <span>{{ minutesLabel }}</span>
+              </div>
+
+              <div class="vx-datetimepicker__time-list">
+                <button
+                  v-for="m in minutes"
+                  :key="`m-${m}`"
+                  type="button"
+                  class="vx-datetimepicker__time-cell"
+                  :class="{ 'vx-datetimepicker__time-cell--selected': m === pendingMinute }"
+                  @click="pickMinute(m)"
+                >
+                  {{ pad(m) }}
+                </button>
+              </div>
             </div>
           </div>
         </div>
 
         <div class="vx-datetimepicker__footer">
           <button type="button" class="vx-datetimepicker__footer-btn" @click="selectNow">
-            {{ resolvedLabels.now }}
+            {{ nowLabel }}
           </button>
+
           <button
             v-if="clearable && modelValue"
             type="button"
             class="vx-datetimepicker__footer-btn vx-datetimepicker__footer-btn--ghost"
             @click="onClear"
           >
-            {{ resolvedLabels.clearFooter }}
+            {{ clearFooterLabel }}
           </button>
+
           <button
             type="button"
             class="vx-datetimepicker__footer-btn vx-datetimepicker__footer-btn--primary"
             :disabled="!pendingDate"
             @click="confirmSelection"
           >
-            {{ resolvedLabels.confirm }}
+            {{ confirmLabel }}
           </button>
         </div>
       </div>
@@ -191,52 +278,23 @@
 <script setup>
 import { computed, ref, watch } from 'vue'
 import { CalendarClock, ChevronLeft, ChevronRight, Clock, X } from 'lucide-vue-next'
-import VxFieldWrapper from '@/Library/core/utils/Input/fieldWrapper.vue'
+import VxFieldWrapper from '@/Library/core/components/Input/fieldWrapper.vue'
 import { useDateFormat } from '@/Library/core/composables/Date/useDateFormat'
 import { useTimeFormat } from '@/Library/core/composables/Date/useTimeFormat'
 import { useCalendarGrid } from '@/Library/core/composables/Date/useCalendarGrid'
 import { useClickOutside } from '@/Library/core/composables/useClickOutside'
-
-const BASE_LABELS = {
-  it: {
-    placeholder: 'Seleziona data e ora',
-    clear: 'Cancella',
-    now: 'Adesso',
-    confirm: 'Conferma',
-    clearFooter: 'Pulisci',
-    prev: 'Precedente',
-    next: 'Successivo',
-    dialogLabel: 'Seleziona data e ora',
-    openLabel: 'Apri selezione data e ora',
-  },
-  en: {
-    placeholder: 'Select date and time',
-    clear: 'Clear',
-    now: 'Now',
-    confirm: 'Confirm',
-    clearFooter: 'Clear',
-    prev: 'Previous',
-    next: 'Next',
-    dialogLabel: 'Select date and time',
-    openLabel: 'Open date and time picker',
-  },
-}
+import { useFloatingPanel } from '@/Library/core/composables/Input/useFloatingPanel'
 
 const props = defineProps({
-  /** Data/ora selezionata, formato canonico 'YYYY-MM-DD HH:MM' (v-model) */
   modelValue: { type: String, default: '' },
   min: { type: String, default: '' },
   max: { type: String, default: '' },
-  locale: { type: String, default: 'it-IT' },
-  /** Maschera della sola parte data (token DD/MM/YYYY). Se omessa, dedotta dal locale. */
+  locale: { type: String, default: 'en-US' },
   format: { type: String, default: '' },
-  /** Maschera della sola parte ora (token HH/mm). Default 'HH:mm'. */
   timeFormat: { type: String, default: 'HH:mm' },
-  /** Separatore visivo tra parte data e parte ora nel campo di testo. */
   separator: { type: String, default: ' ' },
   minuteStep: { type: Number, default: 5 },
   firstDayOfWeek: { type: Number, default: null },
-  labels: { type: Object, default: null },
   variant: { type: String, default: 'outline' },
   color: { type: String, default: '#7c3aed' },
   colors: { type: Object, default: null },
@@ -247,11 +305,18 @@ const props = defineProps({
   pill: { type: Boolean, default: false },
   radius: { type: [Number, String], default: null },
   icon: { type: [Object, Function], default: null },
-  /** Posizione dell'icona nel campo: 'left' | 'right' */
   iconPosition: { type: String, default: 'right' },
   iconSize: { type: [Number, String], default: null },
   clearable: { type: Boolean, default: false },
-  placeholder: { type: String, default: '' },
+  placeholder: { type: String, default: 'Select date and time' },
+  nowLabel: { type: String, default: 'Now' },
+  confirmLabel: { type: String, default: 'Confirm' },
+  clearFooterLabel: { type: String, default: 'Clear' },
+  hoursLabel: { type: String, default: 'Hours' },
+  minutesLabel: { type: String, default: 'Minutes' },
+  dateTabLabel: { type: String, default: 'Date' },
+  timeTabLabel: { type: String, default: 'Time' },
+  summaryLabel: { type: String, default: 'Selected' },
   label: { type: String, default: '' },
   hint: { type: String, default: '' },
   error: { type: Boolean, default: false },
@@ -262,7 +327,17 @@ const props = defineProps({
 const emit = defineEmits(['update:modelValue', 'change', 'focus', 'blur', 'clear'])
 
 const rootRef = ref(null)
+const panelRef = ref(null)
 const isOpen = ref(false)
+const activeTab = ref('date')
+
+const { panelStyle, transitionName, isMobile } = useFloatingPanel(rootRef, panelRef, isOpen, {
+  gap: 8,
+  viewportPadding: 8,
+  modalOnMobile: true,
+  lockScrollOnMobile: true,
+  matchReferenceWidth: false,
+})
 
 const wrapperProps = computed(() => ({
   size: props.size,
@@ -286,13 +361,6 @@ const wrapperProps = computed(() => ({
 
 const iconSlotName = computed(() => `icon-${props.iconPosition === 'left' ? 'left' : 'right'}`)
 
-const lang = computed(() => (props.locale || 'it').split('-')[0].toLowerCase())
-const resolvedLabels = computed(() => ({
-  ...(BASE_LABELS[lang.value] || BASE_LABELS.it),
-  ...(props.labels || {}),
-}))
-const effectivePlaceholder = computed(() => props.placeholder || resolvedLabels.value.placeholder)
-
 const resolvedFirstDayOfWeek = computed(() => {
   if (props.firstDayOfWeek !== null && props.firstDayOfWeek !== undefined) return props.firstDayOfWeek
   return props.locale.toLowerCase() === 'en-us' ? 0 : 1
@@ -302,18 +370,18 @@ const dateFormat = useDateFormat(
   computed(() => props.format),
   computed(() => props.locale)
 )
+
 const timeFormat = useTimeFormat(computed(() => props.timeFormat))
 
 const pad = (n) => String(n).padStart(2, '0')
 const hours = Array.from({ length: 24 }, (_, i) => i)
+
 const minutes = computed(() => {
   const step = props.minuteStep > 0 ? props.minuteStep : 5
   const list = []
   for (let m = 0; m < 60; m += step) list.push(m)
   return list
 })
-
-// ===== Parsing/serializzazione del v-model canonico 'YYYY-MM-DD HH:MM' =====
 
 function parseModel(value) {
   if (!value) return null
@@ -336,9 +404,6 @@ const calendar = useCalendarGrid({
   initialDate: selected.value?.date ?? null,
 })
 
-// Stato "in sospeso" mentre il pannello è aperto: si aggiorna cliccando
-// giorno/ora/minuti, ma viene emesso solo al click su "Conferma" (o subito
-// se si clicca "Adesso").
 const pendingDate = ref(selected.value?.date ?? null)
 const pendingHour = ref(selected.value?.hour ?? new Date().getHours())
 const pendingMinute = ref(selected.value?.minute ?? 0)
@@ -364,6 +429,14 @@ function selectDay(date) {
   pendingDate.value = date
 }
 
+function pickHour(h) {
+  pendingHour.value = h
+}
+
+function pickMinute(m) {
+  pendingMinute.value = m
+}
+
 function confirmSelection() {
   if (!pendingDate.value) return
   const value = serializeModel(pendingDate.value, pendingHour.value, pendingMinute.value)
@@ -375,9 +448,12 @@ function confirmSelection() {
 function selectNow() {
   const now = new Date()
   if (isDayDisabled(now)) return
+
+  const step = props.minuteStep > 0 ? props.minuteStep : 5
   pendingDate.value = now
   pendingHour.value = now.getHours()
-  pendingMinute.value = now.getMinutes() - (now.getMinutes() % (props.minuteStep || 5))
+  pendingMinute.value = now.getMinutes() - (now.getMinutes() % step)
+
   const value = serializeModel(pendingDate.value, pendingHour.value, pendingMinute.value)
   emit('update:modelValue', value)
   emit('change', value)
@@ -387,33 +463,52 @@ function selectNow() {
 function onClear(event) {
   event?.stopPropagation?.()
   emit('update:modelValue', '')
+  emit('change', '')
   emit('clear')
+  inputValue.value = ''
+  if (isOpen.value) isOpen.value = false
+}
+
+function openPicker() {
+  if (props.disabled || props.loading) return
+  isOpen.value = true
+
+  const current = selected.value
+  calendar.resetToDate(current?.date ?? null)
+  pendingDate.value = current?.date ?? null
+  pendingHour.value = current?.hour ?? new Date().getHours()
+  pendingMinute.value = current?.minute ?? 0
+  activeTab.value = 'date'
 }
 
 function toggleOpen() {
   if (props.disabled || props.loading) return
-  isOpen.value = !isOpen.value
   if (isOpen.value) {
-    const current = selected.value
-    calendar.resetToDate(current?.date ?? null)
-    pendingDate.value = current?.date ?? null
-    pendingHour.value = current?.hour ?? new Date().getHours()
-    pendingMinute.value = current?.minute ?? 0
+    isOpen.value = false
+    return
   }
+  openPicker()
+}
+
+function onFieldFocus(event, chromeFocus) {
+  openPicker()
+  chromeFocus?.(event)
+  emit('focus', event)
 }
 
 useClickOutside(rootRef, () => {
+  if (!isOpen.value) return
   isOpen.value = false
 })
-
-// ===== Digitazione manuale combinata data + ora =====
 
 const dateDigitsLen = computed(() =>
   dateFormat.formatTemplate.value.reduce((t, s) => t + (s.type !== 'literal' ? s.length : 0), 0)
 )
+
 const timeDigitsLen = computed(() =>
   timeFormat.formatTemplate.value.reduce((t, s) => t + (s.type !== 'literal' ? s.length : 0), 0)
 )
+
 const combinedMaxLength = computed(
   () => dateFormat.inputMaxLength.value + props.separator.length + timeFormat.inputMaxLength.value
 )
@@ -430,6 +525,9 @@ watch(
   () => props.modelValue,
   () => {
     inputValue.value = displayValue.value
+    pendingDate.value = selected.value?.date ?? null
+    pendingHour.value = selected.value?.hour ?? new Date().getHours()
+    pendingMinute.value = selected.value?.minute ?? 0
   }
 )
 
@@ -437,8 +535,10 @@ function onInput(event) {
   const digits = event.target.value.replace(/\D/g, '')
   const dateDigits = digits.slice(0, dateDigitsLen.value)
   const timeDigits = digits.slice(dateDigitsLen.value, dateDigitsLen.value + timeDigitsLen.value)
+
   const datePart = dateFormat.maskDigitsForInput(dateDigits)
   const timePart = timeFormat.maskDigitsForInput(timeDigits)
+
   inputValue.value = timeDigits.length > 0 ? `${datePart}${props.separator}${timePart}` : datePart
 }
 
@@ -459,16 +559,23 @@ function commitInput() {
   const timeDigits = digits.slice(dateDigitsLen.value, dateDigitsLen.value + timeDigitsLen.value)
 
   const { day, month, year } = dateFormat.parseTemplateDigits(dateDigits)
+
   if (!day?.complete || !month?.complete || !year?.complete || String(year.value).length < 4) {
     inputValue.value = displayValue.value
     return
   }
 
   const date = new Date(year.value, month.value - 1, day.value)
-  if (date.getFullYear() !== year.value || date.getMonth() !== month.value - 1 || date.getDate() !== day.value) {
+
+  if (
+    date.getFullYear() !== year.value ||
+    date.getMonth() !== month.value - 1 ||
+    date.getDate() !== day.value
+  ) {
     inputValue.value = displayValue.value
     return
   }
+
   if (isDayDisabled(date)) {
     inputValue.value = displayValue.value
     return
@@ -479,12 +586,17 @@ function commitInput() {
   const m = minute?.complete ? Math.min(minute.value, 59) : 0
 
   const value = serializeModel(date, h, m)
+
+  pendingDate.value = date
+  pendingHour.value = h
+  pendingMinute.value = m
+
   if (value !== props.modelValue) {
     emit('update:modelValue', value)
     emit('change', value)
-  } else {
-    inputValue.value = displayValue.value
   }
+
+  inputValue.value = `${dateFormat.formatDateWithTemplate(date)}${props.separator}${timeFormat.formatTimeWithTemplate(h, m)}`
 }
 
 function onEnter(event) {
@@ -495,6 +607,7 @@ function onEnter(event) {
 function onInputBlur(event, chromeBlur) {
   commitInput()
   chromeBlur?.(event)
+  emit('blur', event)
 }
 </script>
 
@@ -546,10 +659,14 @@ function onInputBlur(event, chromeBlur) {
   cursor: pointer;
   color: inherit;
   opacity: 0.7;
-  transition: opacity 0.15s ease;
+  transition: opacity 0.15s ease, transform 0.18s ease;
 
   &:hover {
     opacity: 1;
+  }
+
+  &:active {
+    transform: scale(0.96);
   }
 
   &:disabled {
@@ -560,16 +677,103 @@ function onInputBlur(event, chromeBlur) {
 
 .vx-datetimepicker__panel {
   position: absolute;
-  top: calc(100% + 6px);
-  left: 0;
   z-index: 50;
   width: 360px;
-  padding: 16px;
+  max-width: calc(100vw - 16px);
+  max-height: min(560px, calc(100dvh - 16px));
+  padding: 12px;
   border-radius: 16px;
-  border: 1px solid rgba(0, 0, 0, 0.1);
+  border: 1px solid rgba(0, 0, 0, 0.08);
   background: var(--vx-datetimepicker-panel-bg, #fff);
   color: var(--vx-datetimepicker-panel-text, #1e1e1e);
-  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.14);
+  box-shadow:
+    0 10px 24px rgba(0, 0, 0, 0.10),
+    0 24px 54px rgba(0, 0, 0, 0.14);
+  overflow: auto;
+  box-sizing: border-box;
+  will-change: transform, opacity;
+  backface-visibility: hidden;
+
+  /* Stato "a riposo" per la modal mobile: il centraggio è definito qui via
+     classe CSS (non più come style inline), così le classi della transition
+     possono sovrascrivere transform durante l'animazione senza conflitti
+     di specificità. */
+  &--mobile-modal {
+    transform: translate(-50%, -50%);
+  }
+}
+
+.vx-datetimepicker__summary {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin-bottom: 12px;
+  padding: 12px;
+  border-radius: 12px;
+  background: color-mix(in srgb, var(--vx-datetimepicker-accent, #7c3aed) 10%, transparent);
+  color: var(--vx-datetimepicker-accent, #7c3aed);
+}
+
+.vx-datetimepicker__summary-label {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  opacity: 0.72;
+}
+
+.vx-datetimepicker__summary-main {
+  font-size: 19px;
+  line-height: 1.15;
+  font-weight: 700;
+  color: inherit;
+  word-break: break-word;
+}
+
+.vx-datetimepicker__summary-sub {
+  font-size: 13px;
+  font-weight: 700;
+  opacity: 0.88;
+}
+
+.vx-datetimepicker__tabs {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 6px;
+  margin-bottom: 10px;
+}
+
+.vx-datetimepicker__tab {
+  min-width: 0;
+  border: none;
+  border-radius: 10px;
+  padding: 8px 10px;
+  font-size: 12.5px;
+  font-weight: 700;
+  cursor: pointer;
+  background: transparent;
+  color: inherit;
+  opacity: 0.72;
+  transition: background 0.18s ease, color 0.18s ease, opacity 0.18s ease, transform 0.18s ease;
+
+  &:hover {
+    opacity: 1;
+    background: color-mix(in srgb, currentColor 8%, transparent);
+  }
+
+  &:active {
+    transform: scale(0.98);
+  }
+
+  &--active {
+    opacity: 1;
+    background: color-mix(in srgb, var(--vx-datetimepicker-accent, #7c3aed) 14%, transparent);
+    color: var(--vx-datetimepicker-accent, #7c3aed);
+  }
+}
+
+.vx-datetimepicker__tabpanel {
+  min-width: 0;
 }
 
 .vx-datetimepicker__nav {
@@ -592,10 +796,15 @@ function onInputBlur(event, chromeBlur) {
   cursor: pointer;
   color: inherit;
   opacity: 0.7;
+  transition: background 0.18s ease, opacity 0.18s ease, transform 0.18s ease;
 
   &:hover {
     opacity: 1;
     background: color-mix(in srgb, currentColor 8%, transparent);
+  }
+
+  &:active {
+    transform: scale(0.95);
   }
 }
 
@@ -611,9 +820,14 @@ function onInputBlur(event, chromeBlur) {
   cursor: pointer;
   border-radius: 6px;
   padding: 2px 8px;
+  transition: background 0.18s ease, transform 0.18s ease;
 
   &:hover {
     background: color-mix(in srgb, currentColor 8%, transparent);
+  }
+
+  &:active {
+    transform: scale(0.98);
   }
 }
 
@@ -648,17 +862,21 @@ function onInputBlur(event, chromeBlur) {
   display: flex;
   align-items: center;
   justify-content: center;
-  height: 28px;
+  height: 30px;
   border: none;
   border-radius: 8px;
   background: transparent;
   color: inherit;
   font-size: 12.5px;
   cursor: pointer;
-  transition: background 0.12s ease, color 0.12s ease;
+  transition: background 0.16s ease, color 0.16s ease, transform 0.16s ease;
 
   &:not(&--selected):not(:disabled):hover {
     background: color-mix(in srgb, currentColor 8%, transparent);
+  }
+
+  &:not(:disabled):active {
+    transform: scale(0.96);
   }
 
   &:disabled {
@@ -688,16 +906,21 @@ function onInputBlur(event, chromeBlur) {
   display: flex;
   align-items: center;
   justify-content: center;
-  height: 32px;
+  height: 34px;
   border: none;
   border-radius: 8px;
   background: transparent;
   color: inherit;
   font-size: 13px;
   cursor: pointer;
+  transition: background 0.16s ease, transform 0.16s ease;
 
   &:hover {
     background: color-mix(in srgb, currentColor 8%, transparent);
+  }
+
+  &:active {
+    transform: scale(0.97);
   }
 
   &--today {
@@ -705,16 +928,15 @@ function onInputBlur(event, chromeBlur) {
   }
 }
 
-.vx-datetimepicker__time {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 8px;
-  margin-top: 10px;
-  padding-top: 10px;
-  border-top: 1px solid rgba(0, 0, 0, 0.08);
+.vx-datetimepicker__time-cols {
+  display: flex;
+  gap: 6px;
+  max-height: 240px;
 }
 
-.vx-datetimepicker__time-section {
+.vx-datetimepicker__time-col {
+  flex: 1 1 0;
+  min-width: 0;
   display: flex;
   flex-direction: column;
   gap: 6px;
@@ -731,18 +953,28 @@ function onInputBlur(event, chromeBlur) {
   opacity: 0.65;
 }
 
-.vx-datetimepicker__time-grid {
-  display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 4px;
-  max-height: 100px;
-  overflow: auto;
+.vx-datetimepicker__time-list {
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  max-height: 200px;
   padding-right: 2px;
   scrollbar-width: thin;
+
+  &::-webkit-scrollbar {
+    width: 4px;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background: rgba(0, 0, 0, 0.15);
+    border-radius: 4px;
+  }
 }
 
 .vx-datetimepicker__time-cell {
-  min-height: 30px;
+  flex-shrink: 0;
+  min-height: 32px;
   border: 1px solid rgba(0, 0, 0, 0.08);
   border-radius: 8px;
   background: transparent;
@@ -750,10 +982,14 @@ function onInputBlur(event, chromeBlur) {
   font-size: 12px;
   font-weight: 600;
   cursor: pointer;
-  transition: background 0.12s ease, color 0.12s ease;
+  transition: background 0.16s ease, color 0.16s ease, transform 0.16s ease;
 
   &:not(&--selected):hover {
     background: color-mix(in srgb, currentColor 8%, transparent);
+  }
+
+  &:active {
+    transform: scale(0.98);
   }
 
   &--selected {
@@ -761,7 +997,7 @@ function onInputBlur(event, chromeBlur) {
     color: #fff;
 
     &:hover {
-        background: color-mix(in srgb, var(--vx-dtrange-accent, #7c3aed) 85%, black);
+      background: color-mix(in srgb, var(--vx-datetimepicker-accent, #7c3aed) 85%, black);
     }
   }
 }
@@ -785,9 +1021,14 @@ function onInputBlur(event, chromeBlur) {
   cursor: pointer;
   background: color-mix(in srgb, var(--vx-datetimepicker-accent, #7c3aed) 12%, transparent);
   color: var(--vx-datetimepicker-accent, #7c3aed);
+  transition: background 0.18s ease, color 0.18s ease, opacity 0.18s ease, transform 0.18s ease;
 
   &:hover {
     background: color-mix(in srgb, var(--vx-datetimepicker-accent, #7c3aed) 20%, transparent);
+  }
+
+  &:active {
+    transform: scale(0.98);
   }
 
   &:disabled {
@@ -816,14 +1057,100 @@ function onInputBlur(event, chromeBlur) {
   }
 }
 
-.vx-datetimepicker-fade-enter-active,
-.vx-datetimepicker-fade-leave-active {
-  transition: opacity 0.12s ease, transform 0.12s ease;
+.vx-datetimepicker-float-enter-active,
+.vx-datetimepicker-float-leave-active {
+  transition:
+    opacity 180ms cubic-bezier(0.22, 1, 0.36, 1),
+    transform 220ms cubic-bezier(0.16, 1, 0.3, 1),
+    filter 220ms cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-.vx-datetimepicker-fade-enter-from,
-.vx-datetimepicker-fade-leave-to {
+.vx-datetimepicker-float-enter-from,
+.vx-datetimepicker-float-leave-to {
   opacity: 0;
-  transform: translateY(-4px);
+  transform: translateY(-6px) scale(0.985);
+  filter: blur(4px);
+}
+
+.vx-datetimepicker-float-enter-to,
+.vx-datetimepicker-float-leave-from {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+  filter: blur(0);
+}
+
+.vx-datetimepicker-mobile-enter-active,
+.vx-datetimepicker-mobile-leave-active {
+  transition:
+    opacity 220ms cubic-bezier(0.22, 1, 0.36, 1),
+    transform 280ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* FIX: le posizioni di partenza/arrivo sono ora relative al punto di riposo
+   già centrato (translate(-50%, -50%)), applicando solo un piccolo offset
+   verticale + scala. Prima il valore di riposo era impostato inline con lo
+   stesso transform, quindi questi stati "from/to" venivano sovrascritti e
+   l'animazione non partiva mai davvero dal centro. */
+.vx-datetimepicker-mobile-enter-from,
+.vx-datetimepicker-mobile-leave-to {
+  opacity: 0;
+  transform: translate(-50%, calc(-50% + 20px)) scale(0.94);
+}
+
+.vx-datetimepicker-mobile-enter-to,
+.vx-datetimepicker-mobile-leave-from {
+  opacity: 1;
+  transform: translate(-50%, -50%) scale(1);
+}
+
+@media (max-width: 640px) {
+  .vx-datetimepicker__panel {
+    width: calc(100vw - 16px);
+    max-width: calc(100vw - 16px);
+    padding: 10px;
+    border-radius: 14px;
+  }
+
+  .vx-datetimepicker__summary {
+    padding: 10px;
+  }
+
+  .vx-datetimepicker__summary-main {
+    font-size: 17px;
+  }
+
+  .vx-datetimepicker__footer {
+    flex-direction: column;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .vx-datetimepicker__icon-btn,
+  .vx-datetimepicker__clear,
+  .vx-datetimepicker__tab,
+  .vx-datetimepicker__nav-btn,
+  .vx-datetimepicker__month,
+  .vx-datetimepicker__day,
+  .vx-datetimepicker__cell,
+  .vx-datetimepicker__time-cell,
+  .vx-datetimepicker__footer-btn,
+  .vx-datetimepicker-float-enter-active,
+  .vx-datetimepicker-float-leave-active,
+  .vx-datetimepicker-mobile-enter-active,
+  .vx-datetimepicker-mobile-leave-active {
+    transition-duration: 0.01ms !important;
+  }
+
+  .vx-datetimepicker-float-enter-from,
+  .vx-datetimepicker-float-leave-to,
+  .vx-datetimepicker-float-enter-to,
+  .vx-datetimepicker-float-leave-from,
+  .vx-datetimepicker-mobile-enter-from,
+  .vx-datetimepicker-mobile-leave-to,
+  .vx-datetimepicker-mobile-enter-to,
+  .vx-datetimepicker-mobile-leave-from {
+    transform: none !important;
+    filter: none !important;
+  }
 }
 </style>
