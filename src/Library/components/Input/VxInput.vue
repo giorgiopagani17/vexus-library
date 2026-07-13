@@ -156,8 +156,8 @@ export const INPUT_TYPES = [
   'tel',
   'url',
   'file',
-  'checkbox',
 ]
+
 </script>
 
 <script setup>
