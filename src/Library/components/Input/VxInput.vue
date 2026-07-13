@@ -157,7 +157,6 @@ export const INPUT_TYPES = [
   'url',
   'file',
   'checkbox',
-  'radio',
 ]
 </script>
 

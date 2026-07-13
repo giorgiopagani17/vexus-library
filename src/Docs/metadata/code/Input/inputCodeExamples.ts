@@ -1,4 +1,4 @@
-export const setupCode = `import Input from '@/Library/components/Input/Input.vue'`
+export const setupCode = `import VxInput from '@/Library/components/Input/VxInput.vue'`
 
 export const variantCode = `<VxInput v-model="value" placeholder="Outline" />
 <VxInput v-model="value" variant="ghost" placeholder="Ghost" />
@@ -57,13 +57,13 @@ export const iconCode = `<VxInput
   <template #icon-left>
     <Search />
   </template>
-</Input>
+</VxInput>
 
 <VxInput v-model="value" placeholder="Slot right">
   <template #icon-right>
     <CircleAlert />
   </template>
-</Input>`
+</VxInput>`
 
 export const stateCode = `<VxInput v-model="value" loading placeholder="Loading..." />
 <VxInput v-model="value" clearable placeholder="Campo svuotabile" />`
@@ -132,7 +132,7 @@ export const eventsCode = `<VxInput
   @input="onInput"
 />`
 
-export const datePickerCode = `import VxDatePicker from '@/Library/components/Input/InputDate.vue'
+export const datePickerCode = `import VxDatePicker from '@/Library/components/Input/VxDatePicker.vue'
 
 <VxDatePicker v-model="date" placeholder="Seleziona una data" />
 
@@ -157,15 +157,9 @@ export const datePickerCode = `import VxDatePicker from '@/Library/components/In
   block
 />`
 
-export const dateRangeCode = `import VxDateRange from '@/Library/components/Input/InputDateRange.vue'
+export const dateRangeCode = `import VxDateRange from '@/Library/components/Input/VxDateRange.vue'
 
-<VxDateRange
-  v-model="range"
-  :labels="{
-    startPlaceholder: 'Data inizio',
-    endPlaceholder: 'Data fine'
-  }"
-/>
+<VxDateRange v-model="range" placeholder="Seleziona un intervallo" />
 
 <VxDateRange
   v-model="range"
@@ -173,9 +167,11 @@ export const dateRangeCode = `import VxDateRange from '@/Library/components/Inpu
   min="2026-01-01"
   max="2026-12-31"
 />
+
+<VxDateRange v-model="range" rangeSeparator="→" />
 `
 
-export const dateTimeCode = `import VxDateTimePicker from '@/Library/components/Input/InputDateTime.vue'
+export const dateTimeCode = `import VxDateTimePicker from '@/Library/components/Input/VxDateTimePicker.vue'
 
 <VxDateTimePicker v-model="value" />
 
@@ -192,24 +188,24 @@ export const dateTimeCode = `import VxDateTimePicker from '@/Library/components/
 />
 `
 
-export const dateTimeRangeCode = `import VxDateTimeRange from '@/Library/components/Input/InputDateTimeRange.vue'
+export const dateTimeRangeCode = `import VxDateTimeRange from '@/Library/components/Input/VxDateTimeRange.vue'
 
-<VxDateTimeRange
-  v-model="range"
-  :labels="{
-    startPlaceholder: 'Data/ora inizio',
-    endPlaceholder: 'Data/ora fine'
-  }"
-/>
+<VxDateTimeRange v-model="range" placeholder="Seleziona data e ora di inizio/fine" />
 
 <VxDateTimeRange
   v-model="range"
   clearable
   :minuteStep="15"
 />
+
+<VxDateTimeRange
+  v-model="range"
+  startLabel="Check-in"
+  endLabel="Check-out"
+/>
 `
 
-export const timePickerCode = `import VxTimePicker from '@/Library/components/Input/InputTime.vue'
+export const timePickerCode = `import VxTimePicker from '@/Library/components/Input/VxTimePicker.vue'
 
 <VxTimePicker v-model="time" placeholder="Seleziona un orario" />
 
@@ -221,7 +217,7 @@ export const timePickerCode = `import VxTimePicker from '@/Library/components/In
   placeholder="Step 15 min"
 />`
 
-export const colorPickerCode = `import VxColorPicker from '@/Library/components/Input/InputColor.vue'
+export const colorPickerCode = `import VxColorPicker from '@/Library/components/Input/VxColorPicker.vue'
 
 <VxColorPicker v-model="color" />
 
@@ -229,7 +225,7 @@ export const colorPickerCode = `import VxColorPicker from '@/Library/components/
 
 <VxColorPicker v-model="color" :showHex="false" />`
 
-export const rangeCode = `import VxRange from '@/Library/components/Input/InputRange.vue'
+export const rangeCode = `import VxRange from '@/Library/components/Input/VxRange.vue'
 
 <VxRange v-model="value" block />
 
@@ -243,3 +239,66 @@ export const rangeCode = `import VxRange from '@/Library/components/Input/InputR
 />
 
 <VxRange v-model="value" :showValue="false" color="#f97316" block />`
+
+export const checkboxCode = `import VxCheckbox from '@/Library/components/Input/VxCheckbox.vue'
+
+<VxCheckbox
+  v-model="accepted"
+  label="Accetto i termini e condizioni"
+/>
+
+<VxCheckbox
+  v-model="selected"
+  value="a"
+  label="Opzione A"
+/>
+
+<VxCheckbox
+  v-model="selected"
+  value="b"
+  label="Opzione B"
+/>
+
+<VxCheckbox
+  v-model="accepted"
+  error
+  errorMessage="Devi accettare per continuare"
+  label="Checkbox con errore"
+/>
+
+<VxCheckbox
+  :modelValue="false"
+  indeterminate
+  label="Stato indeterminato"
+/>
+
+<VxCheckbox
+  v-model="loading"
+  loading
+  label="Salvataggio in corso..."
+/>`
+
+export const radioCode = `import VxRadio from '@/Library/components/Input/VxRadio.vue'
+
+<VxRadio
+  v-model="plan"
+  name="plan"
+  value="monthly"
+  label="Mensile"
+/>
+
+<VxRadio
+  v-model="plan"
+  name="plan"
+  value="yearly"
+  label="Annuale"
+/>
+
+<VxRadio
+  v-model="choice"
+  name="choice"
+  value="yes"
+  label="Radio con errore"
+  error
+  errorMessage="Seleziona un'opzione per continuare"
+/>`

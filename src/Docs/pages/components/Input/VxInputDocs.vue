@@ -41,8 +41,7 @@
         <code>&lt;input&gt;</code> pensati per un campo di testo:
         <code>text</code>, <code>password</code>, <code>email</code>,
         <code>number</code>, <code>tel</code>, <code>url</code>,
-        oltre a <code>file</code>, <code>checkbox</code>,
-        <code>radio</code>. Viene
+        oltre a <code>file</code>. Viene
         ignorata se <code>tag="textarea"</code>.
       </p>
 
@@ -59,10 +58,15 @@
       </div>
 
       <p class="section-note">
-        <code>checkbox</code>, <code>radio</code> sono supportati allo stesso modo tramite
-        <code>type</code>, ma non sono pensati per lo stile "campo di testo"
-        di questo componente: per quei casi valuta un componente dedicato
-        (es. <code>VxCheckbox</code>, <code>VxRadio</code>).
+        <code>checkbox</code>, <code>radio</code> non sono supportati allo stesso modo tramite
+        <code>type</code>, ma vengono usati i componenti dedicati
+        <code>VxCheckbox</code> e <code>VxRadio</code>, che condividono le
+        stesse prop <code>color</code>/<code>size</code>/<code>disabled</code>/
+        <code>loading</code>/<code>focusEffect</code>/<code>label</code>/
+        <code>hint</code>/<code>error</code>/<code>errorMessage</code> ma con
+        un markup pensato per checkbox e radio (nessun bordo "a campo",
+        supporto a gruppi tramite v-model array per i checkbox e
+        <code>name</code> condiviso per i radio).
       </p>
 
       <p class="section-note">
@@ -90,7 +94,9 @@
         posto del rendering nativo del browser. Il valore è una stringa ISO
         <code>'YYYY-MM-DD'</code>. Supporta <code>min</code>/<code>max</code>
         per limitare l'intervallo selezionabile e <code>clearable</code> come
-        Input.
+        Input. Apertura, anchoring all'input e comportamento responsive
+        (popover su desktop, modal fullscreen su mobile) sono automatici,
+        nessuna prop da configurare.
       </p>
 
       <div class="example-grid">
@@ -119,6 +125,13 @@
       </div>
 
       <DesignCodeBlock :code="datePickerCode" />
+
+      <DesignPropsTable
+        class="docs-props-table"
+        :columns="propsColumns"
+        :rows="datePickerPropsRows"
+        :widths="['140px', '200px', '90px', '1fr']"
+      />
     </section>
 
     <!-- Date range -->
@@ -130,6 +143,8 @@
         è un oggetto con <code>{ start, end }</code> in formato ISO
         <code>'YYYY-MM-DD'</code>. Il campo mostra un placeholder combinato e
         il pannello resta il punto principale per selezionare il range.
+        <code>rangeSeparator</code> controlla sia il separatore mostrato nel
+        campo sia quello riconosciuto in fase di digitazione libera.
       </p>
 
       <div class="example-col">
@@ -138,6 +153,13 @@
       </div>
 
       <DesignCodeBlock :code="dateRangeCode" />
+
+      <DesignPropsTable
+        class="docs-props-table"
+        :columns="propsColumns"
+        :rows="dateRangePropsRows"
+        :widths="['140px', '200px', '90px', '1fr']"
+      />
     </section>
 
     <!-- DateTime picker -->
@@ -158,6 +180,13 @@
       </div>
 
       <DesignCodeBlock :code="dateTimeCode" />
+
+      <DesignPropsTable
+        class="docs-props-table"
+        :columns="propsColumns"
+        :rows="dateTimePickerPropsRows"
+        :widths="['140px', '200px', '90px', '1fr']"
+      />
     </section>
 
     <!-- DateTime range -->
@@ -176,6 +205,13 @@
       </div>
 
       <DesignCodeBlock :code="dateTimeRangeCode" />
+
+      <DesignPropsTable
+        class="docs-props-table"
+        :columns="propsColumns"
+        :rows="dateTimeRangePropsRows"
+        :widths="['140px', '200px', '90px', '1fr']"
+      />
     </section>
 
     <!-- Time picker -->
@@ -183,7 +219,8 @@
       <h2>Time picker</h2>
       <p>
         <code>VxTimePicker</code> sostituisce <code>type="time"</code>: due
-        colonne scorrevoli per ore e minuti. Il valore è una stringa
+        colonne per ore e minuti (con scroll interno, dato che mostrano
+        rispettivamente 24 e fino a 60 valori). Il valore è una stringa
         <code>'HH:MM'</code> (24h). L'intervallo tra un minuto e l'altro si
         controlla con <code>minuteStep</code> (default 5).
       </p>
@@ -195,6 +232,13 @@
       </div>
 
       <DesignCodeBlock :code="timePickerCode" />
+
+      <DesignPropsTable
+        class="docs-props-table"
+        :columns="propsColumns"
+        :rows="timePickerPropsRows"
+        :widths="['140px', '200px', '90px', '1fr']"
+      />
     </section>
 
     <!-- Color picker -->
@@ -215,6 +259,13 @@
       </div>
 
       <DesignCodeBlock :code="colorPickerCode" />
+
+      <DesignPropsTable
+        class="docs-props-table"
+        :columns="propsColumns"
+        :rows="colorPickerPropsRows"
+        :widths="['140px', '200px', '90px', '1fr']"
+      />
     </section>
 
     <!-- Range -->
@@ -235,6 +286,93 @@
       </div>
 
       <DesignCodeBlock :code="rangeCode" />
+
+      <DesignPropsTable
+        class="docs-props-table"
+        :columns="propsColumns"
+        :rows="rangePropsRows"
+        :widths="['140px', '200px', '90px', '1fr']"
+      />
+    </section>
+
+    <!-- Checkbox -->
+    <section class="docs-section">
+      <h2>Checkbox</h2>
+      <p>
+        <code>VxCheckbox</code> copre <code>type="checkbox"</code> con un
+        componente dedicato (niente <code>VxFieldWrapper</code>, markup
+        proprio). <code>v-model</code> booleano per l'uso singolo, oppure
+        <code>v-model</code> array + prop <code>value</code> per un gruppo di
+        checkbox che condividono lo stesso array — stesso pattern dei
+        checkbox nativi con lo stesso <code>name</code>. Supporta anche
+        <code>indeterminate</code> e stato <code>loading</code>.
+      </p>
+
+      <div class="example-col">
+        <VxCheckbox v-model="checkboxExamples.single" label="Accetto i termini e condizioni" />
+
+        <div class="example-row">
+          <VxCheckbox v-model="checkboxExamples.group" value="a" label="Opzione A" />
+          <VxCheckbox v-model="checkboxExamples.group" value="b" label="Opzione B" />
+          <VxCheckbox v-model="checkboxExamples.group" value="c" label="Opzione C" />
+        </div>
+
+        <VxCheckbox
+          v-model="checkboxExamples.error"
+          label="Checkbox con errore"
+          error
+          errorMessage="Devi accettare per continuare"
+        />
+
+        <VxCheckbox :modelValue="false" indeterminate label="Stato indeterminato" />
+
+        <VxCheckbox v-model="checkboxExamples.loading" loading label="Salvataggio in corso..." />
+      </div>
+
+      <DesignCodeBlock :code="checkboxCode" />
+
+      <DesignPropsTable
+        class="docs-props-table"
+        :columns="propsColumns"
+        :rows="checkboxPropsRows"
+        :widths="['140px', '200px', '90px', '1fr']"
+      />
+    </section>
+
+    <!-- Radio -->
+    <section class="docs-section">
+      <h2>Radio</h2>
+      <p>
+        <code>VxRadio</code> copre <code>type="radio"</code>: più
+        <code>VxRadio</code> con lo stesso <code>name</code> (e idealmente lo
+        stesso <code>v-model</code>) formano un gruppo dove solo uno può
+        essere selezionato, esattamente come i radio nativi.
+      </p>
+
+      <div class="example-col">
+        <div class="example-row">
+          <VxRadio v-model="radioExamples.plan" name="plan" value="monthly" label="Mensile" />
+          <VxRadio v-model="radioExamples.plan" name="plan" value="yearly" label="Annuale" />
+        </div>
+
+        <VxRadio
+          v-model="radioExamples.error"
+          name="radio-error"
+          value="yes"
+          label="Radio con errore"
+          error
+          errorMessage="Seleziona un'opzione per continuare"
+        />
+      </div>
+
+      <DesignCodeBlock :code="radioCode" />
+
+      <DesignPropsTable
+        class="docs-props-table"
+        :columns="propsColumns"
+        :rows="radioPropsRows"
+        :widths="['140px', '200px', '90px', '1fr']"
+      />
     </section>
 
     <!-- Color -->
@@ -524,16 +662,21 @@
         <code>VxInput</code> condivide il proprio "chrome" (label, bordo,
         varianti, focus, icone, hint/error) con
         <code>VxFieldWrapper</code>, lo stesso wrapper usato dai componenti
-        dedicati per date, range di date, data+ora, range di data+ora, orari,
-        colore e slider. Se ti serve uno di quei tipi, guarda la
-        documentazione del componente specifico invece di forzarlo su
-        <code>VxInput</code>.
+        dedicati per date, range di date, data+ora, range di data+ora e
+        orari — tutti costruiti sopra lo stesso overlay riutilizzabile
+        (anchoring, positioning, comportamento responsive popover/modal
+        automatici), oltre a colore e slider. <code>VxCheckbox</code> e
+        <code>VxRadio</code> condividono invece solo le prop di stile
+        (colore, size, focus, label/hint/error), non
+        <code>VxFieldWrapper</code>, avendo un markup dedicato. Se ti serve
+        uno di quei tipi, guarda la documentazione del componente specifico
+        invece di forzarlo su <code>VxInput</code>.
       </p>
     </section>
 
     <!-- Props table -->
     <section class="docs-section">
-      <h2>Opzioni disponibili</h2>
+      <h2>Opzioni disponibili (VxInput)</h2>
       <DesignPropsTable
         :columns="propsColumns"
         :rows="propsRows"
@@ -553,11 +696,24 @@ import VxDateTimePicker from '@/Library/components/Input/VxDateTimePicker.vue'
 import VxDateTimeRange from '@/Library/components/Input/VxDateTimeRange.vue'
 import VxTimePicker from '@/Library/components/Input/VxTimePicker.vue'
 import VxColorPicker from '@/Library/components/Input/VxColorPicker.vue'
+import VxCheckbox from '@/Library/components/Input/VxCheckbox.vue'
+import VxRadio from '@/Library/components/Input/VxRadio.vue'
 import VxRange from '@/Library/components/Input/VxRange.vue'
 import DesignCodeBlock from '@/Docs/components/Utils/DesignCodeBlock.vue'
 import DesignPropsTable from '@/Docs/components/Utils/DesignPropsTable.vue'
 import { useVxNotify } from '@/Library/hooks/Notify/useVxNotify'
 import { propsColumns, propsRows } from '@/Docs/metadata/props/Input/inputGeneralProps'
+import {
+  datePickerPropsRows,
+  dateRangePropsRows,
+  dateTimePickerPropsRows,
+  dateTimeRangePropsRows,
+  timePickerPropsRows,
+  colorPickerPropsRows,
+  rangePropsRows,
+  checkboxPropsRows,
+  radioPropsRows,
+} from '@/Docs/metadata/props/Input/inputVariantsProps'
 import {
   setupCode,
   variantCode,
@@ -580,9 +736,23 @@ import {
   timePickerCode,
   colorPickerCode,
   rangeCode,
+  checkboxCode,
+  radioCode,
 } from '@/Docs/metadata/code/Input/inputCodeExamples'
 
 const { VxNotify } = useVxNotify()
+
+const checkboxExamples = reactive({
+  single: false,
+  group: [],
+  error: false,
+  loading: false,
+})
+
+const radioExamples = reactive({
+  plan: 'monthly',
+  error: '',
+})
 
 const variantExamples = reactive({
   ghost: '',
@@ -839,5 +1009,9 @@ const onInput = () => {
     scale: 1.02;
     transition: all 0.2s ease-in-out;
   }
+}
+
+.docs-props-table {
+  margin-top: 16px;
 }
 </style>

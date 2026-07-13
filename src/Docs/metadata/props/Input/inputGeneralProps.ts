@@ -14,7 +14,7 @@ export const propsRows = [
   },
   {
     name: 'type',
-    type: "'text' | 'password' | 'email' | 'number' | 'tel' | 'url' | 'search' | 'file' | 'checkbox' | 'radio' | 'hidden' | 'button' | 'submit' | 'reset' | 'image'",
+    type: "'text' | 'password' | 'email' | 'number' | 'tel' | 'url' | 'file'",
     default: "'text'",
     desc: 'Tipo nativo dell’input, ignorato se tag è textarea'
   },
