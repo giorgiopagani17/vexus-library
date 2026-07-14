@@ -1,5 +1,5 @@
 export const setupCode = `// main.ts — una sola volta, a livello di app
-import { createApiClient } from 'vexus'
+import { createApiClient } from '@vexus'
 import { useAuthStore } from '@/stores/auth'
 
 app.use(createApiClient({
@@ -15,7 +15,7 @@ app.use(createApiClient({
 }))`
 
 export const usageCode = `// In qualsiasi componente, senza altro setup
-import { useVxApi } from 'vexus'
+import { useVxApi } from '@vexus'
 
 const { VxRequest } = useVxApi()
 

@@ -59,7 +59,8 @@ import {
   BookOpen,
   Settings,
   ChevronLeft,
-  ChevronRight
+  ChevronRight,
+  IdCard,
 } from 'lucide-vue-next'
 
 const route = useRoute()
@@ -74,7 +75,8 @@ const menuItems = [
   { label: 'VxButton', icon: MousePointerClick, to: '/button' },
   { label: 'VxInput', icon: TextCursorInput, to: '/input' },
   { label: 'VxNotify', icon: Bell, to: '/notify' },
-  { label: 'VxApi', icon: Phone, to: '/use-api' }
+  { label: 'VxApi', icon: Phone, to: '/use-api' },
+  { label: 'VxFiscalCode', icon: IdCard, to: '/use-fiscal-code' }
 ]
 
 const toggleDrawer = () => {

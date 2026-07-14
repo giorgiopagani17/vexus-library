@@ -52,6 +52,16 @@ export const routes: RouteRecordRaw[] = [
     ]
   },
   {
+    path: '/use-fiscal-code',
+    children: [
+      {
+        path: '',
+        component: () => import('@/Docs/layouts/MainLayout.vue'),
+        children: [{ path: '', component: () => import('@/Docs/pages/components/Cf/VxFiscalCodeDocs.vue') }],
+      }
+    ]
+  },
+  {
     path: '/:catchAll(.*)*',
     component: () => import('@/Docs/pages/ErrorNotFound.vue')
   }

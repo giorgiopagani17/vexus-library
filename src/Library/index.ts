@@ -19,3 +19,10 @@ export type {
   ApiBlobResponse,
 } from '@/Library/core/types/apiTypes';
 export { useVxNotify } from '@/Library/hooks/Notify/useVxNotify';
+export type {
+  VxGenerateFiscalCode,
+  VxIsValidFiscalCodeFormat,
+  VxIsValidFiscalCodeChecksum,
+  VxDecodeFiscalCode,
+  VxUseFiscalCodeValidation,
+} from '@/Library/hooks/Cf/useVxFiscalCode'

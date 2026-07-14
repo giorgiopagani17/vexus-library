@@ -1,6 +1,6 @@
 export const setupCode = `// File.vue
 <script setup>
-import { useVxNotify } from '@/Library/hooks/Notify/useVxNotify'
+import { useVxNotify } from '@vexus'
 
 const { VxNotify } = useVxNotify()
 <\/script>`

@@ -1,4 +1,4 @@
-export const setupCode = `import VxInput from '@/Library/components/Input/VxInput.vue'`
+export const setupCode = `import VxInput from '@vexus'`
 
 export const variantCode = `<VxInput v-model="value" placeholder="Outline" />
 <VxInput v-model="value" variant="ghost" placeholder="Ghost" />
@@ -132,7 +132,7 @@ export const eventsCode = `<VxInput
   @input="onInput"
 />`
 
-export const datePickerCode = `import VxDatePicker from '@/Library/components/Input/VxDatePicker.vue'
+export const datePickerCode = `import VxDatePicker from '@vexus'
 
 <VxDatePicker v-model="date" placeholder="Seleziona una data" />
 
@@ -157,7 +157,7 @@ export const datePickerCode = `import VxDatePicker from '@/Library/components/In
   block
 />`
 
-export const dateRangeCode = `import VxDateRange from '@/Library/components/Input/VxDateRange.vue'
+export const dateRangeCode = `import VxDateRange from '@vexus'
 
 <VxDateRange v-model="range" placeholder="Seleziona un intervallo" />
 
@@ -171,7 +171,7 @@ export const dateRangeCode = `import VxDateRange from '@/Library/components/Inpu
 <VxDateRange v-model="range" rangeSeparator="→" />
 `
 
-export const dateTimeCode = `import VxDateTimePicker from '@/Library/components/Input/VxDateTimePicker.vue'
+export const dateTimeCode = `import VxDateTimePicker from '@vexus'
 
 <VxDateTimePicker v-model="value" />
 
@@ -188,7 +188,7 @@ export const dateTimeCode = `import VxDateTimePicker from '@/Library/components/
 />
 `
 
-export const dateTimeRangeCode = `import VxDateTimeRange from '@/Library/components/Input/VxDateTimeRange.vue'
+export const dateTimeRangeCode = `import VxDateTimeRange from '@vexus'
 
 <VxDateTimeRange v-model="range" placeholder="Seleziona data e ora di inizio/fine" />
 
@@ -205,7 +205,7 @@ export const dateTimeRangeCode = `import VxDateTimeRange from '@/Library/compone
 />
 `
 
-export const timePickerCode = `import VxTimePicker from '@/Library/components/Input/VxTimePicker.vue'
+export const timePickerCode = `import VxTimePicker from '@vexus'
 
 <VxTimePicker v-model="time" placeholder="Seleziona un orario" />
 
@@ -217,7 +217,7 @@ export const timePickerCode = `import VxTimePicker from '@/Library/components/In
   placeholder="Step 15 min"
 />`
 
-export const colorPickerCode = `import VxColorPicker from '@/Library/components/Input/VxColorPicker.vue'
+export const colorPickerCode = `import VxColorPicker from '@vexus'
 
 <VxColorPicker v-model="color" />
 
@@ -225,7 +225,7 @@ export const colorPickerCode = `import VxColorPicker from '@/Library/components/
 
 <VxColorPicker v-model="color" :showHex="false" />`
 
-export const rangeCode = `import VxRange from '@/Library/components/Input/VxRange.vue'
+export const rangeCode = `import VxRange from '@vexus'
 
 <VxRange v-model="value" block />
 
@@ -240,7 +240,7 @@ export const rangeCode = `import VxRange from '@/Library/components/Input/VxRang
 
 <VxRange v-model="value" :showValue="false" color="#f97316" block />`
 
-export const checkboxCode = `import VxCheckbox from '@/Library/components/Input/VxCheckbox.vue'
+export const checkboxCode = `import VxCheckbox from '@vexus'
 
 <VxCheckbox
   v-model="accepted"
@@ -278,7 +278,7 @@ export const checkboxCode = `import VxCheckbox from '@/Library/components/Input/
   label="Salvataggio in corso..."
 />`
 
-export const radioCode = `import VxRadio from '@/Library/components/Input/VxRadio.vue'
+export const radioCode = `import VxRadio from '@vexus'
 
 <VxRadio
   v-model="plan"

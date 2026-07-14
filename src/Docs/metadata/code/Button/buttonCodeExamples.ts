@@ -1,4 +1,4 @@
-export const setupCode = `import VxButton from '@/Library/components/Button/VxButton.vue'`
+export const setupCode = `import VxButton from '@vexus'`
 
 export const variantCode = `<!-- Variant -->
 <VxButton @click="onClick" variant="solid">Solid (default)</Button>
