@@ -14,10 +14,11 @@
     <section class="docs-section">
       <h2>Setup</h2>
       <p>
-        Due moduli separati: <code>codiceFiscale.ts</code> contiene le
-        funzioni pure (nessuna dipendenza, utilizzabili anche fuori da Vue),
-        <code>VxUseFiscalCodeValidation.ts</code> è l'hook Vue che le usa
-        internamente.
+        Un unico modulo, <code>useVxFiscalCode.ts</code>, contiene sia
+        l'implementazione dell'algoritmo del Codice Fiscale italiano (generazione,
+        validazione formale, controllo del carattere di controllo e decodifica),
+        sia l'hook Vue <code>VxUseFiscalCodeValidation</code> che utilizza queste
+        funzioni per validare un Codice Fiscale rispetto ai dati anagrafici forniti.
       </p>
       <DesignCodeBlock :code="setupCode" />
     </section>
