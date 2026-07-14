@@ -1,4 +1,4 @@
-export const setupCode = `import { VxInput, VxCheckbox, VxRadio, VxColor, VxDate, VxDateRange, VxDateTime, VxDateTimeRange, VxTime  } from '@vexus'`
+export const setupCode = `import VxInput from '@vexus'`
 
 export const variantCode = `<VxInput v-model="value" placeholder="Outline" />
 <VxInput v-model="value" variant="ghost" placeholder="Ghost" />

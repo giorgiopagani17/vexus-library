@@ -32,6 +32,16 @@ export const routes: RouteRecordRaw[] = [
     ]
   },
   {
+    path: '/select',
+    children: [
+      {
+        path: '',
+        component: () => import('@/Docs/layouts/MainLayout.vue'),
+        children: [{ path: '', component: () => import('@/Docs/pages/components/Select/VxSelectDocs.vue') }],
+      }
+    ]
+  },
+  {
     path: '/notify',
     children: [
       {

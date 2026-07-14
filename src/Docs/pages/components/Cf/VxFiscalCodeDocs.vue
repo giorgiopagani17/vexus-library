@@ -1,7 +1,7 @@
 <template>
   <div class="docs-page">
     <div class="docs-header">
-      <h1>Codice Fiscale</h1>
+      <h1>VxFiscalCode</h1>
       <p class="subtitle">
         Libreria a zero dipendenze per generare e validare il Codice Fiscale
         italiano (algoritmo implementato internamente, nessuna libreria

@@ -106,6 +106,7 @@ import {
   Menu,
   MousePointerClick,
   TextCursorInput,
+  SquareMenu,
   Bell,
   Phone,
   Home,
@@ -125,15 +126,14 @@ const miniState = ref(false)
 
 const menuStructure = [
   { label: 'Home', icon: Home, to: '/' },
-  { label: 'Componenti', icon: Puzzle, to: '/components' },
   { label: 'Documentazione', icon: BookOpen, to: '/docs' },
-  { label: 'Impostazioni', icon: Settings, to: '/settings' },
   {
     label: 'Componenti UI',
     icon: Blocks,
     children: [
       { label: 'VxButton', icon: MousePointerClick, to: '/button' },
       { label: 'VxInput', icon: TextCursorInput, to: '/input' },
+      { label: 'VxSelect', icon: SquareMenu, to: '/select' },
     ],
   },
   {
