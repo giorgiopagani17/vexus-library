@@ -139,7 +139,7 @@
  * volutamente esclusi. Il rendering nativo del browser per questi tipi
  * (icona calendario/clessidra, popup di selezione) non è restylizzabile
  * in modo coerente col resto del design system: vanno gestiti da
- * componenti dedicati (VxDatePicker, VxTimePicker) che useranno lo
+ * componenti dedicati (VxDate, VxTime) che useranno lo
  * stesso VxFieldWrapper ma con un pannello custom al posto dell'input
  * nativo. Stesso discorso vale in prospettiva per 'color' e 'range'.
  *
@@ -206,7 +206,7 @@ const props = defineProps({
    */
   color: {
     type: String,
-    default: '#7c3aed',
+    default: null,
   },
   /** 'sm' | 'md' | 'lg' */
   size: {
@@ -670,7 +670,7 @@ textarea.vx-input__field,
   border: 0;
 
   &:focus-visible + .vx-input__file-browse {
-    outline: 2px solid var(--vx-input-accent, #7c3aed);
+    outline: 2px solid var(--vx-input-accent, $primary);
     outline-offset: 2px;
   }
 }
@@ -688,12 +688,12 @@ textarea.vx-input__field,
   font-weight: 600;
   cursor: pointer;
   white-space: nowrap;
-  background: color-mix(in srgb, var(--vx-input-accent, #7c3aed) 12%, transparent);
-  color: var(--vx-input-accent, #7c3aed);
+  background: color-mix(in srgb, var(--vx-input-accent, $primary) 12%, transparent);
+  color: var(--vx-input-accent, $primary);
   transition: background 0.15s ease;
 
   &:hover {
-    background: color-mix(in srgb, var(--vx-input-accent, #7c3aed) 20%, transparent);
+    background: color-mix(in srgb, var(--vx-input-accent, $primary) 20%, transparent);
   }
 
   &--disabled {

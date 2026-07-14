@@ -95,7 +95,7 @@ const props = defineProps({
   },
   color: {
     type: String,
-    default: '#7c3aed',
+    default: null,
   },
   colors: {
     type: Object,
@@ -239,12 +239,12 @@ function onBlur(event) {
 }
 
 .vx-radio:not(.vx-radio--disabled):hover .vx-radio__dot {
-  border-color: var(--vx-radio-accent, #7c3aed);
+  border-color: var(--vx-radio-accent, $primary);
 }
 
 .vx-radio--checked .vx-radio__dot {
-  background: var(--vx-radio-accent, #7c3aed);
-  border-color: var(--vx-radio-accent, #7c3aed);
+  background: var(--vx-radio-accent, $primary);
+  border-color: var(--vx-radio-accent, $primary);
 
   &::before {
     transform: scale(1);
@@ -258,7 +258,7 @@ function onBlur(event) {
 }
 
 .vx-radio--focus-ring:has(.vx-radio__input:focus-visible) .vx-radio__dot {
-  box-shadow: 0 0 0 3px color-mix(in srgb, var(--vx-radio-accent, #7c3aed) 30%, transparent);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--vx-radio-accent, $primary) 30%, transparent);
 }
 
 .vx-radio__label {
@@ -285,7 +285,7 @@ function onBlur(event) {
 }
 
 .vx-radio-field__error {
-  color: #dc2626;
+  color: $negative;
 }
 
 @keyframes vx-radio-spin {

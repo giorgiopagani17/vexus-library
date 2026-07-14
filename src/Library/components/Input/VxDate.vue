@@ -221,7 +221,7 @@ const props = defineProps({
   },
   color: {
     type: String,
-    default: '#7c3aed',
+    default: null,
   },
   colors: {
     type: Object,
@@ -586,7 +586,7 @@ function onInputBlur(event, chromeBlur) {
  * Positioning (position/top/left/transform/z-index/transition) è gestito
  * da <AnchoredOverlay>: qui restano solo le proprietà visive del pannello.
  * Nessun overflow/max-height: il pannello si dimensiona sul contenuto,
- * niente scroll interno (coerente con VxDateTimePicker).
+ * niente scroll interno (coerente con VxDateTime).
  */
 .vx-datepicker__panel {
   width: 260px;
@@ -595,7 +595,7 @@ function onInputBlur(event, chromeBlur) {
   border-radius: 12px;
   border: 1px solid rgba(0, 0, 0, 0.1);
   background: var(--vx-datepicker-panel-bg, #fff);
-  color: var(--vx-datepicker-panel-text, #1e1e1e);
+  color: var(--vx-datepicker-panel-text, #000);
   box-shadow: 0 12px 28px rgba(0, 0, 0, 0.14);
   box-sizing: border-box;
 }
@@ -699,15 +699,15 @@ function onInputBlur(event, chromeBlur) {
   }
 
   &--today:not(&--selected) {
-    box-shadow: inset 0 0 0 1px var(--vx-datepicker-accent, #7c3aed);
+    box-shadow: inset 0 0 0 1px var(--vx-datepicker-accent, $primary);
   }
 
   &--selected {
-    background: var(--vx-datepicker-accent, #7c3aed);
+    background: var(--vx-datepicker-accent, $primary);
     color: #fff;
 
     &:hover {
-      background: color-mix(in srgb, var(--vx-datepicker-accent, #7c3aed) 85%, black);
+      background: color-mix(in srgb, var(--vx-datepicker-accent, $primary) 85%, black);
     }
   }
 }
@@ -730,15 +730,15 @@ function onInputBlur(event, chromeBlur) {
   }
 
   &--today:not(&--selected) {
-    box-shadow: inset 0 0 0 1px var(--vx-datepicker-accent, #7c3aed);
+    box-shadow: inset 0 0 0 1px var(--vx-datepicker-accent, $primary);
   }
 
   &--selected {
-    background: var(--vx-datepicker-accent, #7c3aed);
+    background: var(--vx-datepicker-accent, $primary);
     color: #fff;
 
     &:hover {
-      background: color-mix(in srgb, var(--vx-datepicker-accent, #7c3aed) 85%, black);
+      background: color-mix(in srgb, var(--vx-datepicker-accent, $primary) 85%, black);
     }
   }
 }
@@ -760,11 +760,11 @@ function onInputBlur(event, chromeBlur) {
   font-size: 12.5px;
   font-weight: 600;
   cursor: pointer;
-  background: color-mix(in srgb, var(--vx-datepicker-accent, #7c3aed) 12%, transparent);
-  color: var(--vx-datepicker-accent, #7c3aed);
+  background: color-mix(in srgb, var(--vx-datepicker-accent, $primary) 12%, transparent);
+  color: var(--vx-datepicker-accent, $primary);
 
   &:hover {
-    background: color-mix(in srgb, var(--vx-datepicker-accent, #7c3aed) 20%, transparent);
+    background: color-mix(in srgb, var(--vx-datepicker-accent, $primary) 20%, transparent);
   }
 
   &--ghost {

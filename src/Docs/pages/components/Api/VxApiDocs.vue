@@ -146,7 +146,7 @@
 </template>
 
 <script setup>
-import { useVxApi } from '@/Library/hooks/Api/useVxApi'
+import { useVxApi } from '@/Library/composables/Api/useVxApi'
 import DesignButton from '@/Docs/components/Buttons/DesignButton.vue'
 import DesignCodeBlock from '@/Docs/components/Utils/DesignCodeBlock.vue'
 import DesignPropsTable from '@/Docs/components/Utils/DesignPropsTable.vue'
@@ -205,6 +205,12 @@ const demoLoading = () => {
   max-width: 760px;
   margin: 0 auto;
   padding: 40px 24px 80px;
+}
+
+@media (max-width: 600px) {
+  .docs-page {
+    padding: 0;
+  }
 }
 
 .docs-header {

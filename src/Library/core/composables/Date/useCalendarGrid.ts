@@ -90,7 +90,7 @@ export interface UseCalendarGridReturn {
  * Navigazione e generazione della griglia calendario
  * (giorni/mesi/anni).
  *
- * Estratta da VxDatePicker per essere riusata
+ * Estratta da VxDate per essere riusata
  * anche da DateTimePicker / RangePicker.
  */
 export function useCalendarGrid(

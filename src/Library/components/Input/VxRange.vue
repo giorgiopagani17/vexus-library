@@ -59,7 +59,7 @@ const props = defineProps({
   /** Colore della porzione riempita e del thumb */
   color: {
     type: String,
-    default: '#7c3aed',
+    default: null,
   },
   colors: {
     type: Object,
@@ -180,8 +180,8 @@ function onChange(event) {
   border-radius: 999px;
   background: linear-gradient(
     to right,
-    var(--vx-range-color, #7c3aed) 0%,
-    var(--vx-range-color, #7c3aed) var(--vx-range-percent, 50%),
+    var(--vx-range-color, $primary) 0%,
+    var(--vx-range-color, $primary) var(--vx-range-percent, 50%),
     rgba(0, 0, 0, 0.12) var(--vx-range-percent, 50%),
     rgba(0, 0, 0, 0.12) 100%
   );
@@ -197,7 +197,7 @@ function onChange(event) {
     width: 16px;
     height: 16px;
     border-radius: 50%;
-    background: var(--vx-range-color, #7c3aed);
+    background: var(--vx-range-color, $primary);
     border: 2px solid #fff;
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
     cursor: pointer;
@@ -207,7 +207,7 @@ function onChange(event) {
     width: 16px;
     height: 16px;
     border-radius: 50%;
-    background: var(--vx-range-color, #7c3aed);
+    background: var(--vx-range-color, $primary);
     border: 2px solid #fff;
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
     cursor: pointer;

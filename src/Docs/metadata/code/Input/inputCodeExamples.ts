@@ -1,4 +1,4 @@
-export const setupCode = `import VxInput from '@vexus'`
+export const setupCode = `import { VxInput, VxCheckbox, VxRadio, VxColor, VxDate, VxDateRange, VxDateTime, VxDateTimeRange, VxTime  } from '@vexus'`
 
 export const variantCode = `<VxInput v-model="value" placeholder="Outline" />
 <VxInput v-model="value" variant="ghost" placeholder="Ghost" />
@@ -132,25 +132,25 @@ export const eventsCode = `<VxInput
   @input="onInput"
 />`
 
-export const datePickerCode = `import VxDatePicker from '@vexus'
+export const datePickerCode = `import VxDate from '@vexus'
 
-<VxDatePicker v-model="date" placeholder="Seleziona una data" />
+<VxDate v-model="date" placeholder="Seleziona una data" />
 
-<VxDatePicker
+<VxDate
   v-model="date"
   clearable
   color="#22c55e"
   placeholder="Con clear"
 />
 
-<VxDatePicker
+<VxDate
   v-model="date"
   min="2026-01-01"
   max="2026-12-31"
   placeholder="Solo 2026"
 />
 
-<VxDatePicker
+<VxDate
   v-model="birthDate"
   label="Data di nascita"
   hint="Formato gg/mm/aaaa"
@@ -171,17 +171,17 @@ export const dateRangeCode = `import VxDateRange from '@vexus'
 <VxDateRange v-model="range" rangeSeparator="→" />
 `
 
-export const dateTimeCode = `import VxDateTimePicker from '@vexus'
+export const dateTimeCode = `import VxDateTime from '@vexus'
 
-<VxDateTimePicker v-model="value" />
+<VxDateTime v-model="value" />
 
-<VxDateTimePicker
+<VxDateTime
   v-model="value"
   clearable
   :minuteStep="15"
 />
 
-<VxDateTimePicker
+<VxDateTime
   v-model="value"
   separator=" - "
   timeFormat="HH.mm"
@@ -205,13 +205,13 @@ export const dateTimeRangeCode = `import VxDateTimeRange from '@vexus'
 />
 `
 
-export const timePickerCode = `import VxTimePicker from '@vexus'
+export const timePickerCode = `import VxTime from '@vexus'
 
-<VxTimePicker v-model="time" placeholder="Seleziona un orario" />
+<VxTime v-model="time" placeholder="Seleziona un orario" />
 
-<VxTimePicker v-model="time" clearable color="#f97316" />
+<VxTime v-model="time" clearable color="#f97316" />
 
-<VxTimePicker
+<VxTime
   v-model="time"
   :minuteStep="15"
   placeholder="Step 15 min"

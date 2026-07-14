@@ -115,7 +115,7 @@ const props = defineProps({
   },
   color: {
     type: String,
-    default: '#7c3aed',
+    default: null,
   },
   colors: {
     type: Object,
@@ -278,13 +278,13 @@ function onBlur(event) {
 }
 
 .vx-checkbox:not(.vx-checkbox--disabled):hover .vx-checkbox__box {
-  border-color: var(--vx-checkbox-accent, #7c3aed);
+  border-color: var(--vx-checkbox-accent, $primary);
 }
 
 .vx-checkbox--checked .vx-checkbox__box,
 .vx-checkbox--indeterminate .vx-checkbox__box {
-  background: var(--vx-checkbox-accent, #7c3aed);
-  border-color: var(--vx-checkbox-accent, #7c3aed);
+  background: var(--vx-checkbox-accent, $primary);
+  border-color: var(--vx-checkbox-accent, $primary);
 
   svg {
     opacity: 1;
@@ -302,7 +302,7 @@ function onBlur(event) {
 }
 
 .vx-checkbox--focus-ring:has(.vx-checkbox__input:focus-visible) .vx-checkbox__box {
-  box-shadow: 0 0 0 3px color-mix(in srgb, var(--vx-checkbox-accent, #7c3aed) 30%, transparent);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--vx-checkbox-accent, $primary) 30%, transparent);
 }
 
 .vx-checkbox__label {
@@ -329,7 +329,7 @@ function onBlur(event) {
 }
 
 .vx-checkbox-field__error {
-  color: #dc2626;
+  color: $negative;
 }
 
 @keyframes vx-checkbox-spin {

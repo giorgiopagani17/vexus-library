@@ -89,7 +89,7 @@
     <section class="docs-section">
       <h2>Date picker</h2>
       <p>
-        <code>VxDatePicker</code> sostituisce <code>type="date"</code>: stesso
+        <code>VxDate</code> sostituisce <code>type="date"</code>: stesso
         chrome di <code>Input</code>, ma con un pannello calendario custom al
         posto del rendering nativo del browser. Il valore è una stringa ISO
         <code>'YYYY-MM-DD'</code>. Supporta <code>min</code>/<code>max</code>
@@ -100,14 +100,14 @@
       </p>
 
       <div class="example-grid">
-        <VxDatePicker v-model="dateExamples.basic" placeholder="Seleziona una data" />
-        <VxDatePicker
+        <VxDate v-model="dateExamples.basic" placeholder="Seleziona una data" />
+        <VxDate
           v-model="dateExamples.clearable"
           clearable
           color="#22c55e"
           placeholder="Con clear"
         />
-        <VxDatePicker
+        <VxDate
           v-model="dateExamples.ranged"
           min="2026-01-01"
           max="2026-12-31"
@@ -116,7 +116,7 @@
       </div>
 
       <div class="example-col">
-        <VxDatePicker
+        <VxDate
           v-model="dateExamples.labeled"
           label="Data di nascita"
           hint="Formato gg/mm/aaaa"
@@ -166,7 +166,7 @@
     <section class="docs-section">
       <h2>DateTime picker</h2>
       <p>
-        <code>VxDateTimePicker</code> sostituisce <code>type="datetime-local"</code>:
+        <code>VxDateTime</code> sostituisce <code>type="datetime-local"</code>:
         unisce selezione della data e dell'orario nello stesso componente. Il
         <code>v-model</code> usa il formato canonico <code>'YYYY-MM-DD HH:MM'</code>
         e l'ora si controlla con <code>minuteStep</code>, <code>timeFormat</code>
@@ -174,9 +174,9 @@
       </p>
 
       <div class="example-grid">
-        <VxDateTimePicker v-model="dateTimeExamples.basic" />
-        <VxDateTimePicker v-model="dateTimeExamples.clearable" clearable :minuteStep="15" />
-        <VxDateTimePicker v-model="dateTimeExamples.custom" separator=" - " timeFormat="HH.mm" />
+        <VxDateTime v-model="dateTimeExamples.basic" />
+        <VxDateTime v-model="dateTimeExamples.clearable" clearable :minuteStep="15" />
+        <VxDateTime v-model="dateTimeExamples.custom" separator=" - " timeFormat="HH.mm" />
       </div>
 
       <DesignCodeBlock :code="dateTimeCode" />
@@ -218,7 +218,7 @@
     <section class="docs-section">
       <h2>Time picker</h2>
       <p>
-        <code>VxTimePicker</code> sostituisce <code>type="time"</code>: due
+        <code>VxTime</code> sostituisce <code>type="time"</code>: due
         colonne per ore e minuti (con scroll interno, dato che mostrano
         rispettivamente 24 e fino a 60 valori). Il valore è una stringa
         <code>'HH:MM'</code> (24h). L'intervallo tra un minuto e l'altro si
@@ -226,9 +226,9 @@
       </p>
 
       <div class="example-grid">
-        <VxTimePicker v-model="timeExamples.basic" placeholder="Seleziona un orario" />
-        <VxTimePicker v-model="timeExamples.clearable" clearable color="#f97316" />
-        <VxTimePicker v-model="timeExamples.step" :minuteStep="15" placeholder="Step 15 min" />
+        <VxTime v-model="timeExamples.basic" placeholder="Seleziona un orario" />
+        <VxTime v-model="timeExamples.clearable" clearable color="#f97316" />
+        <VxTime v-model="timeExamples.step" :minuteStep="15" placeholder="Step 15 min" />
       </div>
 
       <DesignCodeBlock :code="timePickerCode" />
@@ -690,18 +690,18 @@
 import { reactive, ref } from 'vue'
 import { Search, Mail, CircleAlert } from 'lucide-vue-next'
 import VxInput from '@/Library/components/Input/VxInput.vue'
-import VxDatePicker from '@/Library/components/Input/VxDatePicker.vue'
+import VxDate from '@/Library/components/Input/VxDate.vue'
 import VxDateRange from '@/Library/components/Input/VxDateRange.vue'
-import VxDateTimePicker from '@/Library/components/Input/VxDateTimePicker.vue'
+import VxDateTime from '@/Library/components/Input/VxDateTime.vue'
 import VxDateTimeRange from '@/Library/components/Input/VxDateTimeRange.vue'
-import VxTimePicker from '@/Library/components/Input/VxTimePicker.vue'
+import VxTime from '@/Library/components/Input/VxTime.vue'
 import VxColorPicker from '@/Library/components/Input/VxColorPicker.vue'
 import VxCheckbox from '@/Library/components/Input/VxCheckbox.vue'
 import VxRadio from '@/Library/components/Input/VxRadio.vue'
 import VxRange from '@/Library/components/Input/VxRange.vue'
 import DesignCodeBlock from '@/Docs/components/Utils/DesignCodeBlock.vue'
 import DesignPropsTable from '@/Docs/components/Utils/DesignPropsTable.vue'
-import { useVxNotify } from '@/Library/hooks/Notify/useVxNotify'
+import { useVxNotify } from '@/Library/composables/Notify/useVxNotify'
 import { propsColumns, propsRows } from '@/Docs/metadata/props/Input/inputGeneralProps'
 import {
   datePickerPropsRows,
@@ -908,6 +908,12 @@ const onInput = () => {
   max-width: 760px;
   margin: 0 auto;
   padding: 40px 24px 80px;
+}
+
+@media (max-width: 600px) {
+  .docs-page {
+    padding: 0;
+  }
 }
 
 .docs-header {

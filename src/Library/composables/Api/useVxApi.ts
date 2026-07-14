@@ -1,4 +1,4 @@
-import { useVxNotify } from '@/Library/hooks/Notify/useVxNotify';
+import { useVxNotify } from '@/Library/composables/Notify/useVxNotify';
 import { VxApiConfig } from '@/Library/core/composables/Api/apiConfig';
 import type { ApiOptions, ApiResponse, ApiBlobResponse } from '@/Library/core/types/apiTypes';
 

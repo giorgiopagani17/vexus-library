@@ -15,7 +15,7 @@
  * la stessa libreria (concettualmente) usata da MUI/Base UI per i popper.
  *
  * Firma pensata per essere drop-in compatibile con l'uso già presente in
- * VxDateTimePicker.vue:
+ * VxDateTime.vue:
  *
  *   const { panelStyle, transitionName, isMobile } = useFloatingPanel(
  *     rootRef, panelRef, isOpen,

@@ -2,7 +2,7 @@ import { computed, ref, type ComputedRef, type Ref } from 'vue'
 
 /**
  * Composable condiviso da tutti i componenti "campo" del design system
- * (VxInput, VxDatePicker, VxTimePicker, VxColorPicker, ecc).
+ * (VxInput, VxDate, VxTime, VxColorPicker, ecc).
  *
  * Centralizza:
  *

@@ -307,7 +307,7 @@ const props = defineProps({
   minuteStep: { type: Number, default: 5 },
   firstDayOfWeek: { type: Number, default: null },
   variant: { type: String, default: 'outline' },
-  color: { type: String, default: '#7c3aed' },
+  color: { type: String, default: null },
   colors: { type: Object, default: null },
   size: { type: [String, Object], default: 'md' },
   disabled: { type: Boolean, default: false },
@@ -692,7 +692,7 @@ function onInputBlur(event, chromeBlur) {
   border-radius: 16px;
   border: 1px solid rgba(0, 0, 0, 0.08);
   background: var(--vx-datetimepicker-panel-bg, #fff);
-  color: var(--vx-datetimepicker-panel-text, #1e1e1e);
+  color: var(--vx-datetimepicker-panel-text, #000);
   box-shadow:
     0 10px 24px rgba(0, 0, 0, 0.10),
     0 24px 54px rgba(0, 0, 0, 0.14);
@@ -706,8 +706,8 @@ function onInputBlur(event, chromeBlur) {
   margin-bottom: 12px;
   padding: 12px;
   border-radius: 12px;
-  background: color-mix(in srgb, var(--vx-datetimepicker-accent, #7c3aed) 10%, transparent);
-  color: var(--vx-datetimepicker-accent, #7c3aed);
+  background: color-mix(in srgb, var(--vx-datetimepicker-accent, $primary) 10%, transparent);
+  color: var(--vx-datetimepicker-accent, $primary);
 }
 
 .vx-datetimepicker__summary-label {
@@ -763,8 +763,8 @@ function onInputBlur(event, chromeBlur) {
 
   &--active {
     opacity: 1;
-    background: color-mix(in srgb, var(--vx-datetimepicker-accent, #7c3aed) 14%, transparent);
-    color: var(--vx-datetimepicker-accent, #7c3aed);
+    background: color-mix(in srgb, var(--vx-datetimepicker-accent, $primary) 14%, transparent);
+    color: var(--vx-datetimepicker-accent, $primary);
   }
 }
 
@@ -885,15 +885,15 @@ function onInputBlur(event, chromeBlur) {
   }
 
   &--today:not(&--selected) {
-    box-shadow: inset 0 0 0 1px var(--vx-datetimepicker-accent, #7c3aed);
+    box-shadow: inset 0 0 0 1px var(--vx-datetimepicker-accent, $primary);
   }
 
   &--selected {
-    background: var(--vx-datetimepicker-accent, #7c3aed);
+    background: var(--vx-datetimepicker-accent, $primary);
     color: #fff;
 
     &:hover {
-      background: color-mix(in srgb, var(--vx-datetimepicker-accent, #7c3aed) 85%, black);
+      background: color-mix(in srgb, var(--vx-datetimepicker-accent, $primary) 85%, black);
     }
   }
 }
@@ -920,7 +920,7 @@ function onInputBlur(event, chromeBlur) {
   }
 
   &--today {
-    box-shadow: inset 0 0 0 1px var(--vx-datetimepicker-accent, #7c3aed);
+    box-shadow: inset 0 0 0 1px var(--vx-datetimepicker-accent, $primary);
   }
 }
 
@@ -991,11 +991,11 @@ function onInputBlur(event, chromeBlur) {
   }
 
   &--selected {
-    background: var(--vx-datetimepicker-accent, #7c3aed);
+    background: var(--vx-datetimepicker-accent, $primary);
     color: #fff;
 
     &:hover {
-      background: color-mix(in srgb, var(--vx-datetimepicker-accent, #7c3aed) 85%, black);
+      background: color-mix(in srgb, var(--vx-datetimepicker-accent, $primary) 85%, black);
     }
   }
 }
@@ -1017,12 +1017,12 @@ function onInputBlur(event, chromeBlur) {
   font-size: 12.5px;
   font-weight: 600;
   cursor: pointer;
-  background: color-mix(in srgb, var(--vx-datetimepicker-accent, #7c3aed) 12%, transparent);
-  color: var(--vx-datetimepicker-accent, #7c3aed);
+  background: color-mix(in srgb, var(--vx-datetimepicker-accent, $primary) 12%, transparent);
+  color: var(--vx-datetimepicker-accent, $primary);
   transition: background 0.18s ease, color 0.18s ease, opacity 0.18s ease, transform 0.18s ease;
 
   &:hover {
-    background: color-mix(in srgb, var(--vx-datetimepicker-accent, #7c3aed) 20%, transparent);
+    background: color-mix(in srgb, var(--vx-datetimepicker-accent, $primary) 20%, transparent);
   }
 
   &:active {
@@ -1046,11 +1046,11 @@ function onInputBlur(event, chromeBlur) {
   }
 
   &--primary {
-    background: var(--vx-datetimepicker-accent, #7c3aed);
+    background: var(--vx-datetimepicker-accent, $primary);
     color: #fff;
 
     &:hover {
-      background: color-mix(in srgb, var(--vx-datetimepicker-accent, #7c3aed) 85%, black);
+      background: color-mix(in srgb, var(--vx-datetimepicker-accent, $primary) 85%, black);
     }
   }
 }

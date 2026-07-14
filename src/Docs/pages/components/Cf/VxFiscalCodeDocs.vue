@@ -46,7 +46,7 @@
         </div>
 
         <div class="example-row">
-          <VxDatePicker v-model="generateForm.birthdayDate" label="Data di nascita" block />
+          <VxDate v-model="generateForm.birthdayDate" label="Data di nascita" block />
           <VxInput
             v-model="generateForm.birthplaceCode"
             label="Codice catastale"
@@ -165,7 +165,7 @@
         </div>
 
         <div class="example-row">
-          <VxDatePicker v-model="hookForm.birthdayDate" label="Data di nascita" block />
+          <VxDate v-model="hookForm.birthdayDate" label="Data di nascita" block />
           <VxInput v-model="hookForm.birthplaceCode" label="Codice catastale" block />
         </div>
 
@@ -264,7 +264,7 @@
 <script setup>
 import { computed, reactive, ref } from 'vue'
 import VxInput from '@/Library/components/Input/VxInput.vue'
-import VxDatePicker from '@/Library/components/Input/VxDatePicker.vue'
+import VxDate from '@/Library/components/Input/VxDate.vue'
 import VxCheckbox from '@/Library/components/Input/VxCheckbox.vue'
 import VxRadio from '@/Library/components/Input/VxRadio.vue'
 import DesignCodeBlock from '@/Docs/components/Utils/DesignCodeBlock.vue'
@@ -275,7 +275,7 @@ import {
   VxIsValidFiscalCodeChecksum,
   VxDecodeFiscalCode,
   VxUseFiscalCodeValidation
-} from '@/Library/hooks/Cf/useVxFiscalCode'
+} from '@/Library/composables/Cf/useVxFiscalCode'
 import {
   propsColumns,
   generateInputRows,
@@ -372,6 +372,12 @@ async function runHookValidation() {
   max-width: 760px;
   margin: 0 auto;
   padding: 40px 24px 80px;
+}
+
+@media (max-width: 600px) {
+  .docs-page {
+    padding: 0;
+  }
 }
 
 .docs-header {
@@ -478,7 +484,7 @@ async function runHookValidation() {
   background: rgba($primary, 0.08);
 
   &--error {
-    background: rgba(#dc2626, 0.08);
+    background: rgba($negative, 0.08);
   }
 }
 
@@ -512,8 +518,8 @@ async function runHookValidation() {
   }
 
   &--ko {
-    background: rgba(#dc2626, 0.12);
-    color: #dc2626;
+    background: rgba($negative, 0.12);
+    color: $negative;
   }
 }
 

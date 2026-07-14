@@ -1,6 +1,6 @@
 // Stessa struttura di colonne di inputGeneralProps.js, riusata per ogni
-// variante dedicata (VxDatePicker, VxDateRange, VxDateTimePicker,
-// VxDateTimeRange, VxTimePicker, VxColorPicker, VxRange). Tenerle separate
+// variante dedicata (VxDate, VxDateRange, VxDateTime,
+// VxDateTimeRange, VxTime, VxColorPicker, VxRange). Tenerle separate
 // da inputGeneralProps evita di mischiare prop di VxInput (type, spinners,
 // accept, ecc.) che su queste varianti non esistono.
 //

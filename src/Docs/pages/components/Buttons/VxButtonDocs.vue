@@ -258,7 +258,7 @@ import { Sparkles } from 'lucide-vue-next'
 import VxButton from '@/Library/components/Button/VxButton.vue'
 import DesignCodeBlock from '@/Docs/components/Utils/DesignCodeBlock.vue'
 import DesignPropsTable from '@/Docs/components/Utils/DesignPropsTable.vue'
-import { useVxNotify } from '@/Library/hooks/Notify/useVxNotify'
+import { useVxNotify } from '@/Library/composables/Notify/useVxNotify'
 import { propsColumns, propsRows } from '@/Docs/metadata/props/Button/buttonGeneralProps'
 import {
   setupCode,
@@ -294,6 +294,12 @@ const onClick = () => {
   max-width: 760px;
   margin: 0 auto;
   padding: 40px 24px 80px;
+}
+
+@media (max-width: 600px) {
+  .docs-page {
+    padding: 0;
+  }
 }
 
 .docs-header {

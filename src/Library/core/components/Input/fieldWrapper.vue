@@ -36,7 +36,7 @@
 
       <!--
         Slot di default: qui il componente chiamante (VxInput,
-        VxDatePicker, ...) renderizza il proprio elemento interattivo
+        VxDate, ...) renderizza il proprio elemento interattivo
         (input, textarea, bottone-trigger di un popup, ecc).
         Vengono esposti fieldId/isFocused/onFocus/onBlur perché il
         wrapper non sa nulla del tipo di controllo che riceve.
@@ -116,7 +116,7 @@ const props = defineProps({
    */
   color: {
     type: String,
-    default: '#7c3aed',
+    default: 'null',
   },
   /**
    * Override colori custom, scavalca il colore impostato tramite `color`.

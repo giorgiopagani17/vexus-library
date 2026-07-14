@@ -19,17 +19,70 @@
       :class="{ 'sidebar--mini': miniState, 'sidebar--hidden': !drawerOpen }"
     >
       <nav class="menu">
-        <RouterLink
-          v-for="item in menuItems"
-          :key="item.label"
-          :to="item.to"
-          class="menu-item"
-          active-class="menu-item--active"
-        >
-          <component :is="item.icon" :size="20" />
-          <span v-if="!miniState" class="menu-label">{{ item.label }}</span>
-          <span v-if="miniState" class="tooltip">{{ item.label }}</span>
-        </RouterLink>
+        <template v-for="item in menuStructure" :key="item.label">
+          <!-- Voce semplice, senza sottomenu -->
+          <RouterLink
+            v-if="!item.children"
+            :to="item.to"
+            class="menu-item"
+            active-class="menu-item--active"
+          >
+            <component :is="item.icon" :size="20" />
+            <span v-if="!miniState" class="menu-label">{{ item.label }}</span>
+            <span v-if="miniState" class="tooltip">{{ item.label }}</span>
+          </RouterLink>
+
+          <!-- Voce con sottomenu -->
+          <div
+            v-else
+            class="menu-group"
+            :class="{ 'menu-group--open': isGroupOpen(item.label) }"
+          >
+            <button
+              class="menu-item menu-item--group"
+              :class="{ 'menu-item--active': isChildActive(item) }"
+              @click="toggleGroup(item.label)"
+            >
+              <component :is="item.icon" :size="20" />
+              <span v-if="!miniState" class="menu-label">{{ item.label }}</span>
+              <ChevronDown
+                v-if="!miniState"
+                :size="16"
+                class="group-chevron"
+              />
+              <!-- Niente tooltip qui in mini: ci pensa il flyout -->
+            </button>
+
+            <!-- Sottomenu ad accordion (sidebar espansa) -->
+            <div v-if="!miniState && isGroupOpen(item.label)" class="submenu-wrapper">
+              <RouterLink
+                v-for="child in item.children"
+                :key="child.label"
+                :to="child.to"
+                class="submenu-item"
+                active-class="submenu-item--active"
+              >
+                <component :is="child.icon" :size="16" />
+                <span class="menu-label">{{ child.label }}</span>
+              </RouterLink>
+            </div>
+
+            <!-- Sottomenu a flyout (sidebar mini) -->
+            <div v-else class="submenu-flyout">
+              <div class="submenu-flyout__title">{{ item.label }}</div>
+              <RouterLink
+                v-for="child in item.children"
+                :key="child.label"
+                :to="child.to"
+                class="submenu-item"
+                active-class="submenu-item--active"
+              >
+                <component :is="child.icon" :size="16" />
+                <span class="menu-label">{{ child.label }}</span>
+              </RouterLink>
+            </div>
+          </div>
+        </template>
       </nav>
 
       <button class="collapse-btn" @click="miniState = !miniState">
@@ -44,10 +97,11 @@
 </template>
 
 <script setup>
-import { ref, computed } from 'vue'
+import { ref } from 'vue'
 import DesignLanguageSwitcher from '@/Docs/components/Utils/DesignLanguageSwitcher.vue'
 import { useRoute } from 'vue-router'
 import VexusLogo from '/vexus_logo.png'
+import { useClickOutside } from '@/Library/core/composables/useClickOutside'
 import {
   Menu,
   MousePointerClick,
@@ -55,11 +109,13 @@ import {
   Bell,
   Phone,
   Home,
+  Blocks,
   Puzzle,
   BookOpen,
   Settings,
   ChevronLeft,
   ChevronRight,
+  ChevronDown,
   IdCard,
 } from 'lucide-vue-next'
 
@@ -67,17 +123,55 @@ const route = useRoute()
 const drawerOpen = ref(true)
 const miniState = ref(false)
 
-const menuItems = [
+const menuStructure = [
   { label: 'Home', icon: Home, to: '/' },
   { label: 'Componenti', icon: Puzzle, to: '/components' },
   { label: 'Documentazione', icon: BookOpen, to: '/docs' },
   { label: 'Impostazioni', icon: Settings, to: '/settings' },
-  { label: 'VxButton', icon: MousePointerClick, to: '/button' },
-  { label: 'VxInput', icon: TextCursorInput, to: '/input' },
-  { label: 'VxNotify', icon: Bell, to: '/notify' },
-  { label: 'VxApi', icon: Phone, to: '/use-api' },
-  { label: 'VxFiscalCode', icon: IdCard, to: '/use-fiscal-code' }
+  {
+    label: 'Componenti UI',
+    icon: Blocks,
+    children: [
+      { label: 'VxButton', icon: MousePointerClick, to: '/button' },
+      { label: 'VxInput', icon: TextCursorInput, to: '/input' },
+    ],
+  },
+  {
+    label: 'Composables',
+    icon: Puzzle,
+    children: [
+      { label: 'VxNotify', icon: Bell, to: '/notify' },
+      { label: 'VxApi', icon: Phone, to: '/use-api' },
+      { label: 'VxFiscalCode', icon: IdCard, to: '/use-fiscal-code' },
+    ],
+  },
 ]
+
+const openGroups = ref(new Set())
+
+function isGroupOpen(label) {
+  return openGroups.value.has(label)
+}
+
+function toggleGroup(label) {
+  const next = new Set(openGroups.value)
+  if (next.has(label)) {
+    next.delete(label)
+  } else {
+    next.add(label)
+  }
+  openGroups.value = next
+}
+
+function isChildActive(item) {
+  return item.children?.some((child) => child.to === route.path) ?? false
+}
+
+menuStructure.forEach((item) => {
+  if (item.children && isChildActive(item)) {
+    openGroups.value.add(item.label)
+  }
+})
 
 const toggleDrawer = () => {
   drawerOpen.value = !drawerOpen.value
@@ -166,11 +260,14 @@ const toggleDrawer = () => {
   border-right: 1px solid rgba($primary, 0.15);
   display: flex;
   flex-direction: column;
+  overflow-y: auto;
+  overflow-x: hidden;
   transition: width 0.25s ease, transform 0.25s ease;
   z-index: 90;
 
   &--mini {
     width: 68px;
+    overflow: visible;
   }
 
   &--hidden {
@@ -208,6 +305,13 @@ const toggleDrawer = () => {
   text-decoration: none;
   white-space: nowrap;
   overflow: visible;
+  border: none;
+  background: transparent;
+  width: 100%;
+  box-sizing: border-box; // <-- fix overflow-x: senza questo i <a> sforavano di 28px (padding in content-box)
+  font: inherit;
+  cursor: pointer;
+  text-align: left;
   transition: background 0.2s ease, color 0.2s ease;
 
   &:hover {
@@ -228,10 +332,69 @@ const toggleDrawer = () => {
       color: $primary;
     }
   }
+
+  &--group {
+    justify-content: flex-start;
+  }
 }
 
 .menu-label {
   font-size: 14px;
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.group-chevron {
+  transition: transform 0.2s ease;
+  flex: 0 0 auto;
+}
+
+.menu-group--open .group-chevron {
+  transform: rotate(180deg);
+}
+
+.submenu-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 4px 0 4px 18px;
+  overflow: hidden;
+  max-height: 0;
+  transition: max-height 0.25s ease;
+}
+
+.menu-group--open .submenu-wrapper {
+  max-height: 400px;
+}
+
+.submenu-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 8px 14px;
+  border-radius: 8px;
+  color: rgba(255, 255, 255, 0.6);
+  text-decoration: none;
+  font-size: 13px;
+  white-space: nowrap;
+  box-sizing: border-box;
+  transition: background 0.2s ease, color 0.2s ease;
+
+  &:hover {
+    background: rgba(255, 255, 255, 0.04);
+  }
+
+  &--active {
+    background: rgba($primary, 0.1);
+    color: $primary;
+
+    svg {
+      color: $primary;
+    }
+  }
 }
 
 .tooltip {
@@ -254,6 +417,46 @@ const toggleDrawer = () => {
   pointer-events: none;
   z-index: 110;
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+}
+
+.submenu-flyout {
+  position: absolute;
+  left: 100%;
+  top: 0;
+  margin-left: 8px;
+  min-width: 180px;
+  padding: 8px;
+  border-radius: 10px;
+  background: rgba($tertiary, 0.97);
+  border: 1px solid rgba($primary, 0.25);
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateX(4px);
+  transition: opacity 0.2s ease, transform 0.2s ease, visibility 0.2s ease;
+  pointer-events: none;
+  z-index: 110;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+
+  &__title {
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+    color: rgba(255, 255, 255, 0.5);
+    padding: 4px 10px 8px;
+  }
+
+  .submenu-item {
+    border-left: none;
+    padding: 8px 10px;
+  }
+}
+
+.menu-group {
+  position: relative;
 }
 
 .collapse-btn {
@@ -312,7 +515,8 @@ const toggleDrawer = () => {
     margin-left: 0;
   }
 
-  .tooltip {
+  .tooltip,
+  .submenu-flyout {
     display: none;
   }
 }

@@ -55,7 +55,7 @@
     </VxFieldWrapper>
 
     <!--
-      Stesso schema di VxDatePicker/VxDateTimePicker: apertura, anchoring,
+      Stesso schema di VxDate/VxDateTime: apertura, anchoring,
       positioning e responsive sono delegati ad AnchoredOverlay.
     -->
     <AnchoredOverlay
@@ -202,7 +202,7 @@ const props = defineProps({
   },
   color: {
     type: String,
-    default: '#7c3aed',
+    default: null,
   },
   colors: {
     type: Object,
@@ -596,7 +596,7 @@ function onFieldBlur(event, chromeBlur) {
   border-radius: 12px;
   border: 1px solid rgba(0, 0, 0, 0.1);
   background: var(--vx-daterange-panel-bg, #fff);
-  color: var(--vx-daterange-panel-text, #1e1e1e);
+  color: var(--vx-daterange-panel-text, #000);
   box-shadow: 0 12px 28px rgba(0, 0, 0, 0.14);
   box-sizing: border-box;
 }
@@ -700,21 +700,21 @@ function onFieldBlur(event, chromeBlur) {
   }
 
   &--today:not(&--start):not(&--end) {
-    box-shadow: inset 0 0 0 1px var(--vx-daterange-accent, #7c3aed);
+    box-shadow: inset 0 0 0 1px var(--vx-daterange-accent, $primary);
   }
 
   &--in-range {
-    background: color-mix(in srgb, var(--vx-daterange-accent, #7c3aed) 14%, transparent);
+    background: color-mix(in srgb, var(--vx-daterange-accent, $primary) 14%, transparent);
     border-radius: 0;
   }
 
   &--start,
   &--end {
-    background: var(--vx-daterange-accent, #7c3aed);
+    background: var(--vx-daterange-accent, $primary);
     color: #fff;
 
     &:hover {
-      background: color-mix(in srgb, var(--vx-daterange-accent, #7c3aed) 85%, black);
+      background: color-mix(in srgb, var(--vx-daterange-accent, $primary) 85%, black);
     }
   }
 }
@@ -736,7 +736,7 @@ function onFieldBlur(event, chromeBlur) {
   }
 
   &--today {
-    box-shadow: inset 0 0 0 1px var(--vx-daterange-accent, #7c3aed);
+    box-shadow: inset 0 0 0 1px var(--vx-daterange-accent, $primary);
   }
 }
 

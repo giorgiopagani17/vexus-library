@@ -145,7 +145,7 @@ const props = defineProps({
   },
   color: {
     type: String,
-    default: '#7c3aed',
+    default: null,
   },
   colors: {
     type: Object,
@@ -479,7 +479,7 @@ function onInputBlur(event, chromeBlur) {
   border-radius: 12px;
   border: 1px solid rgba(0, 0, 0, 0.1);
   background: var(--vx-timepicker-panel-bg, #fff);
-  color: var(--vx-timepicker-panel-text, #1e1e1e);
+  color: var(--vx-timepicker-panel-text, #000);
   box-shadow: 0 12px 28px rgba(0, 0, 0, 0.14);
   box-sizing: border-box;
 }
@@ -525,11 +525,11 @@ function onInputBlur(event, chromeBlur) {
   }
 
   &--selected {
-    background: var(--vx-timepicker-accent, #7c3aed);
+    background: var(--vx-timepicker-accent, $primary);
     color: #fff;
 
     &:hover {
-      background: color-mix(in srgb, var(--vx-timepicker-accent, #7c3aed) 85%, black);
+      background: color-mix(in srgb, var(--vx-timepicker-accent, $primary) 85%, black);
     }
   }
 }
@@ -549,11 +549,11 @@ function onInputBlur(event, chromeBlur) {
   font-size: 12.5px;
   font-weight: 600;
   cursor: pointer;
-  background: color-mix(in srgb, var(--vx-timepicker-accent, #7c3aed) 12%, transparent);
-  color: var(--vx-timepicker-accent, #7c3aed);
+  background: color-mix(in srgb, var(--vx-timepicker-accent, $primary) 12%, transparent);
+  color: var(--vx-timepicker-accent, $primary);
 
   &:hover {
-    background: color-mix(in srgb, var(--vx-timepicker-accent, #7c3aed) 20%, transparent);
+    background: color-mix(in srgb, var(--vx-timepicker-accent, $primary) 20%, transparent);
   }
 
   &--ghost {

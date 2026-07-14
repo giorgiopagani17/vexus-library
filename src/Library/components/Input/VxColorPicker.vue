@@ -64,7 +64,7 @@ const props = defineProps({
   /** Colore del bordo/focus ring del campo (non del valore selezionato) */
   color: {
     type: String,
-    default: '#7c3aed',
+    default: null,
   },
   colors: {
     type: Object,
