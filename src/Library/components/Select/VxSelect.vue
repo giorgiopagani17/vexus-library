@@ -1,5 +1,5 @@
 <template>
-  <VxFieldWrapper v-bind="wrapperProps" :style="{ '--vx-select-accent': color }">
+  <VxFieldWrapper ref="fieldWrapperRef" v-bind="wrapperProps" :style="{ '--vx-select-accent': color }">
     <template v-if="$slots['icon-left']" #icon-left>
       <slot name="icon-left" />
     </template>
@@ -20,7 +20,7 @@
       >
         <div v-if="multiple && useChips && selectedOptions.length" class="vx-select__chips">
           <span v-for="opt in selectedOptions" :key="chipKey(opt)" class="vx-select__chip">
-            {{ resolveLabel(opt) }}
+            {{ resolveSelectedLabel(opt) }}
             <button
               type="button"
               class="vx-select__chip-remove"
@@ -41,14 +41,18 @@
           class="vx-select__search"
           type="text"
           autocomplete="off"
-          :value="isOpen ? searchText : displayText"
-          :placeholder="placeholder"
+          :value="triggerValue"
+          :placeholder="inputPlaceholder"
           :disabled="fieldDisabled || loading"
           @input="onSearchInput"
           @click.stop="openPanel(fieldDisabled)"
         />
-        <span v-else class="vx-select__value" :class="{ 'vx-select__value--placeholder': !displayText }">
-          {{ displayText || placeholder }}
+        <span
+          v-else
+          class="vx-select__value"
+          :class="{ 'vx-select__value--placeholder': !displayText && !!inputPlaceholder }"
+        >
+          {{ displayText || inputPlaceholder }}
         </span>
       </div>
     </template>
@@ -85,30 +89,39 @@
   <Teleport to="body">
     <div v-if="isOpen" ref="panelRef" class="vx-select__panel" :style="panelStyle">
       <ul class="vx-select__list" role="listbox">
-        <li
-          v-for="(opt, idx) in displayedOptions"
-          :key="optionKey(opt, idx)"
-          class="vx-select__option"
-          :class="{
-            'vx-select__option--highlighted': idx === highlightedIndex,
-            'vx-select__option--selected': isSelected(opt),
-          }"
-          role="option"
-          :aria-selected="isSelected(opt)"
-          @mousedown.prevent
-          @click="selectOption(opt)"
-          @mouseenter="highlightedIndex = idx"
-        >
-          <slot name="option" :option="opt" :selected="isSelected(opt)">
-            {{ resolveLabel(opt) }}
-          </slot>
-        </li>
+        <!-- stato di loading iniziale: nasconde lista/empty-state finché la prima pagina non risponde -->
+        <template v-if="isLoading">
+          <li class="vx-select__loading-more">
+            <Loader2 :size="16" class="spin" />
+          </li>
+        </template>
 
-        <li v-if="!isLoading && displayedOptions.length === 0" class="vx-select__empty">
-          {{ noOptionsLabel }}
-        </li>
+        <template v-else>
+          <li
+            v-for="(opt, idx) in displayedOptions"
+            :key="optionKey(opt, idx)"
+            class="vx-select__option"
+            :class="{
+              'vx-select__option--highlighted': idx === highlightedIndex,
+              'vx-select__option--selected': isSelected(opt),
+            }"
+            role="option"
+            :aria-selected="isSelected(opt)"
+            @mousedown.prevent
+            @click="selectOption(opt)"
+            @mouseenter="highlightedIndex = idx"
+          >
+            <slot name="option" :option="opt" :selected="isSelected(opt)">
+              {{ resolveLabel(opt) }}
+            </slot>
+          </li>
 
-        <li v-if="url" ref="sentinelRef" class="vx-select__sentinel" aria-hidden="true"></li>
+          <li v-if="displayedOptions.length === 0" class="vx-select__empty">
+            {{ noOptionsLabel }}
+          </li>
+        </template>
+
+        <li v-if="url && !isLoading" ref="sentinelRef" class="vx-select__sentinel" aria-hidden="true"></li>
 
         <li v-if="isLoadingMore" class="vx-select__loading-more">
           <Loader2 :size="16" class="spin" />
@@ -175,6 +188,10 @@ const props = defineProps({
   rowsPerPage: { type: Number, default: 10 },
   maxPage: { type: [Number, null], default: null },
   extraParams: { type: Object, default: () => ({}) },
+  /** Path (dot notation) per estrarre l'array di opzioni dal body della risposta, es. 'results' o 'data.content' */
+  dataPath: { type: String, default: '' },
+  /** Bearer token per-select, se l'endpoint non è pubblico e non è coperto da un interceptor globale */
+  token: { type: String, default: null },
 })
 
 const emit = defineEmits(['update:modelValue', 'focus', 'blur', 'clear', 'open', 'close', 'filter'])
@@ -186,6 +203,11 @@ const triggerRef = ref(null)
 const searchInputRef = ref(null)
 const panelRef = ref(null)
 const sentinelRef = ref(null)
+// ref sul componente VxFieldWrapper: è il vero box visivo (bordo/padding),
+// usato per il posizionamento del pannello invece del trigger interno,
+// che non ha padding proprio e produrrebbe un pannello leggermente
+// più stretto/spostato rispetto al box visibile della select.
+const fieldWrapperRef = ref(null)
 
 // ===== stato pannello =====
 const isOpen = ref(false)
@@ -199,6 +221,12 @@ const totalElements = ref(0)
 const isLoading = ref(false)
 const isLoadingMore = ref(false)
 const searchText = ref('')
+// true dal momento in cui l'utente digita nel campo, finché non seleziona
+// un'opzione o il pannello viene richiuso/riaperto. Serve a distinguere
+// "sto cercando" (mostra searchText) da "sto solo guardando cosa ho
+// selezionato" (mostra displayText), altrimenti in multiple senza chip
+// il campo resterebbe vuoto finché il pannello non si chiude.
+const hasTyped = ref(false)
 
 let fetchId = 0
 let searchTimeout = null
@@ -223,6 +251,11 @@ const wrapperProps = computed(() => ({
   icon: props.icon,
   iconPosition: props.iconPosition,
   iconSize: props.iconSize,
+  // con chip attive il contenuto del trigger può andare su più righe:
+  // serve "multiline" sul wrapper, altrimenti il box resta ad altezza
+  // fissa (32/40/48px) e le chip aggiunte restano visivamente clippate
+  // finché qualcosa non forza un reflow (es. chiusura del pannello).
+  multiline: props.multiple && props.useChips,
 }))
 
 // ===== helpers di risoluzione label/value =====
@@ -240,6 +273,24 @@ function getOptionValue(opt) {
   return opt
 }
 
+function findOptionByValue(value) {
+  const source = props.url ? remoteOptions.value : props.options
+  return source.find((o) => getOptionValue(o) === value)
+}
+
+/**
+ * Risolve la label da mostrare per un elemento selezionato (chip o testo),
+ * gestendo sia il caso in cui modelValue contiene l'oggetto opzione, sia il
+ * caso emitValue in cui contiene il valore grezzo (es. id).
+ */
+function resolveSelectedLabel(entry) {
+  if (props.emitValue && (typeof entry !== 'object' || entry === null)) {
+    const match = findOptionByValue(entry)
+    return match ? resolveLabel(match) : String(entry)
+  }
+  return resolveLabel(entry)
+}
+
 function sameValue(a, b) {
   const va = typeof a === 'object' && a !== null ? getOptionValue(a) : a
   const vb = typeof b === 'object' && b !== null ? getOptionValue(b) : b
@@ -255,6 +306,12 @@ function chipKey(opt) {
   return String(getOptionValue(opt) ?? resolveLabel(opt))
 }
 
+/** Estrae un valore annidato da un oggetto tramite dot notation, es. 'data.content' */
+function getByPath(obj, path) {
+  if (!path) return undefined
+  return path.split('.').reduce((acc, key) => (acc && acc[key] !== undefined ? acc[key] : undefined), obj)
+}
+
 // ===== derivate su modelValue =====
 const hasValue = computed(() => {
   if (props.multiple) return Array.isArray(props.modelValue) && props.modelValue.length > 0
@@ -267,14 +324,35 @@ const selectedOptions = computed(() => {
 })
 
 const displayText = computed(() => {
-  if (props.multiple) return ''
+  if (props.multiple) {
+    // con le chip attive il testo del box resta vuoto (le chip sostituiscono il testo)
+    if (props.useChips) return ''
+    // senza chip mostriamo le label selezionate come testo semplice
+    return selectedOptions.value.map((entry) => resolveSelectedLabel(entry)).join(', ')
+  }
+
   if (!hasValue.value) return ''
   if (!props.emitValue) return resolveLabel(props.modelValue)
 
-  // emitValue: il v-model è un valore grezzo, cerchiamo l'opzione corrispondente per mostrarne la label
-  const source = props.url ? remoteOptions.value : props.options
-  const match = source.find((o) => getOptionValue(o) === props.modelValue)
+  const match = findOptionByValue(props.modelValue)
   return match ? resolveLabel(match) : String(props.modelValue)
+})
+
+// placeholder dell'input: va nascosto quando ci sono chip selezionate,
+// altrimenti resterebbe visibile accanto alle chip perché il :value
+// dell'input, in quel caso, è sempre stringa vuota
+const inputPlaceholder = computed(() => {
+  if (props.multiple && props.useChips && selectedOptions.value.length > 0) return ''
+  return props.placeholder
+})
+
+// valore mostrato nell'input: searchText solo mentre l'utente sta
+// effettivamente digitando una ricerca, altrimenti displayText (così in
+// multiple + !useChips la selezione si riflette subito, senza dover
+// chiudere il pannello)
+const triggerValue = computed(() => {
+  if (isOpen.value && hasTyped.value) return searchText.value
+  return displayText.value
 })
 
 function isSelected(opt) {
@@ -295,8 +373,7 @@ const hasMore = computed(() => {
 })
 
 // Garantisce che il valore già selezionato resti visibile in lista anche
-// se non è nella pagina remota attualmente caricata (stessa logica del
-// tuo InputSelect Quasar).
+// se non è nella pagina remota attualmente caricata.
 function mergePresetValue(opts) {
   if (!hasValue.value) return opts
   const values = props.multiple
@@ -325,6 +402,7 @@ const displayedOptions = computed(() => {
 function openPanel(disabled) {
   if (disabled || props.loading || isOpen.value) return
   searchText.value = ''
+  hasTyped.value = false
   isOpen.value = true
 }
 
@@ -345,11 +423,15 @@ watch(isOpen, async (open) => {
   if (open) {
     emit('open')
     resetHighlight()
-    await nextTick()
-    computePanelPosition()
+    // avviato PRIMA del nextTick: isLoading passa a true in modo sincrono
+    // (prima di qualunque await interno), così il primo render del
+    // pannello aperto mostra già lo stato di loading e non un flash di
+    // "nessuna opzione disponibile" seguito da lista vuota senza feedback
     if (props.url && remoteOptions.value.length === 0) {
       fetchOptions(0, false)
     }
+    await nextTick()
+    computePanelPosition()
     await nextTick()
     setupSentinelObserver()
     window.addEventListener('scroll', onOutsideScroll, true)
@@ -362,6 +444,7 @@ watch(isOpen, async (open) => {
     window.removeEventListener('resize', computePanelPosition)
     document.removeEventListener('mousedown', onDocumentMouseDown, true)
     if (props.url) searchText.value = ''
+    hasTyped.value = false
   }
 })
 
@@ -378,8 +461,10 @@ function onOutsideScroll(event) {
 
 // ===== posizionamento viewport-aware =====
 function computePanelPosition() {
-  if (!triggerRef.value) return
-  const rect = triggerRef.value.getBoundingClientRect()
+  const el = fieldWrapperRef.value?.$el ?? triggerRef.value
+  if (!el) return
+
+  const rect = el.getBoundingClientRect()
   const viewportHeight = window.innerHeight
   const maxPanelHeight = 260
   const spaceBelow = viewportHeight - rect.bottom
@@ -425,6 +510,7 @@ function maybeLoadMore() {
 function onSearchInput(event) {
   const val = event.target.value
   searchText.value = val
+  hasTyped.value = true
   emit('filter', val)
   resetHighlight()
 
@@ -436,7 +522,7 @@ function onSearchInput(event) {
   }, 400)
 }
 
-// ===== fetch remoto, stesso mutex/fetchId del tuo InputSelect =====
+// ===== fetch remoto =====
 async function fetchOptions(page = 0, append = false) {
   if (!props.url) return
   if (page === 0 && isLoading.value) return
@@ -453,12 +539,21 @@ async function fetchOptions(page = 0, append = false) {
     }
     if (searchText.value.trim()) query[props.searchParam] = searchText.value.trim()
 
-    const res = await VxRequest(props.url, { method: 'GET', query })
+    const res = await VxRequest(props.url, {
+      method: 'GET',
+      query,
+      ...(props.token ? { headers: { Authorization: `Bearer ${props.token}` } } : {}),
+    })
 
     // scarta risposte "vecchie" arrivate dopo una ricerca più recente
     if (page === 0 && myId !== fetchId) return
 
-    const raw = res?.data?.content ?? res?.data ?? []
+    // il "body" è res.data se VxRequest avvolge la risposta stile axios,
+    // altrimenti res stesso; dataPath è sempre risolto rispetto a questo body
+    const body = res?.data ?? res
+    const raw = props.dataPath
+      ? (getByPath(body, props.dataPath) ?? [])
+      : (body?.content ?? body ?? [])
 
     if (res?.data?.totalElements != null) {
       totalElements.value = res.data.totalElements
@@ -482,9 +577,9 @@ async function fetchOptions(page = 0, append = false) {
   }
 }
 
-// resetta la cache remota se cambia url/extraParams (stesso watch del componente Quasar)
+// resetta la cache remota se cambia url/extraParams/token
 watch(
-  () => JSON.stringify({ url: props.url, extraParams: props.extraParams }),
+  () => JSON.stringify({ url: props.url, extraParams: props.extraParams, token: props.token }),
   () => {
     remoteOptions.value = []
     totalElements.value = 0
@@ -504,6 +599,8 @@ function selectOption(opt) {
     else current.push(value)
     emit('update:modelValue', current)
     searchText.value = ''
+    // torna a mostrare displayText subito, senza aspettare la chiusura del pannello
+    hasTyped.value = false
   } else {
     emit('update:modelValue', value)
     closePanel()
@@ -518,6 +615,7 @@ function removeChip(opt) {
 function onClear() {
   emit('update:modelValue', props.multiple ? [] : null)
   searchText.value = ''
+  hasTyped.value = false
   emit('clear')
   if (props.url) fetchOptions(0, false)
 }
@@ -580,6 +678,7 @@ onBeforeUnmount(() => {
   gap: 6px;
   width: 100%;
   min-width: 0;
+  min-height: 100%;
   cursor: pointer;
   outline: none;
 }
@@ -681,13 +780,14 @@ onBeforeUnmount(() => {
 }
 
 .vx-select__panel {
+  box-sizing: border-box;
   z-index: 2000;
   overflow-y: auto;
   border-radius: 10px;
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  background: var(--vx-select-panel-bg, #1a1a1f);
-  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.4);
-  backdrop-filter: blur(12px);
+  border: 1px solid var(--vx-select-panel-border, rgba(0, 0, 0, 0.08));
+  background: var(--vx-select-panel-bg, #ffffff);
+  color: var(--vx-select-panel-color, #1f1f24);
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.12);
 }
 
 .vx-select__list {

@@ -11,7 +11,7 @@ const app = createApp(App)
 app.directive('click-away', clickAway)
 
 app.use(createApiClient({
-  baseUrl: 'https://jsonplaceholder.typicode.com/',
+  baseUrl: '',
   getAccessToken: () => null,
   getRefreshToken: () => null,
 }))

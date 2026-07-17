@@ -131,7 +131,8 @@
 
         <p>
             Le chip della selezione multipla possono essere disabilitate con
-            <code>useChips</code>.
+            <code>useChips</code>. In quel caso le etichette selezionate vengono
+            mostrate come semplice testo separato da virgola.
         </p>
 
         <div class="example-grid">
@@ -176,14 +177,24 @@
             tramite scroll.
         </p>
 
+        <p class="section-note">
+            Se l'array di opzioni non si trova direttamente in <code>res.data</code>
+            o <code>res.data.content</code>, usa <code>dataPath</code> per indicare
+            il percorso (dot notation) all'interno della risposta. Ad esempio l'API
+            Rick and Morty restituisce <code>{ info: {...}, results: [...] }</code>,
+            quindi serve <code>dataPath="results"</code>. Se l'endpoint richiede
+            autenticazione, passa il bearer token con la prop <code>token</code>.
+        </p>
+
         <div class="example-grid">
             <VxSelect
-            v-model="selectExamples.remote"
-            url="/api/users"
-            optionLabel="name"
-            optionValue="id"
-            emitValue
-            placeholder="Cerca utenti"
+              v-model="selectExamples.remote"
+              url="https://rickandmortyapi.com/api/character"
+              dataPath="results"
+              optionLabel="name"
+              optionValue="id"
+              emitValue
+              placeholder="Cerca personaggi"
             />
         </div>
 

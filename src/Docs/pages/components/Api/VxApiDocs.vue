@@ -15,9 +15,6 @@
       <p>
         Registra il plugin una sola volta nel <code>main.ts</code> del progetto,
         collegando la libreria allo store di autenticazione e all'env locali.
-        In questa pagina il plugin è già registrato con
-        <code>baseUrl: 'https://jsonplaceholder.typicode.com/'</code>, così puoi
-        provare le chiamate dal vivo.
       </p>
       <DesignCodeBlock :code="setupCode" />
     </section>
