@@ -193,6 +193,7 @@
               dataPath="results"
               optionLabel="name"
               optionValue="id"
+              searchParam="name"
               emitValue
               placeholder="Cerca personaggi"
             />

@@ -45,6 +45,7 @@ export const remoteCode = `<VxSelect
   url="/api/users"
   optionLabel="name"
   optionValue="id"
+  searchParam="name"
   emitValue
 />`
 
